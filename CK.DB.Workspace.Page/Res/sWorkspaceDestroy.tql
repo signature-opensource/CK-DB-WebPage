@@ -1,0 +1,14 @@
+-- SetupConfig: {}
+create transformer on CK.sWorkspaceDestroy
+as
+begin
+    inject "
+    declare @PageId int;
+    select @PageId = PageId
+        from CK.tWorkspace
+        where WorkspaceId = @WorkspaceId;
+    
+    exec CK.sWebPageDestroy @ActorId, @PageId, 1;
+    
+    " into "PostDestroy";
+end

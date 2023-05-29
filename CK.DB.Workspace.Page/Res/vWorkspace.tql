@@ -1,0 +1,9 @@
+-- SetupConfig: {}
+create transformer on CK.vWorkspace
+as
+begin
+    inject "
+    inner join CK.tResPath rp on w.PageId = rp.ResId" after single {from CK.tWorkspace w};
+
+    add column rp.ResPath, w.PageId;
+end

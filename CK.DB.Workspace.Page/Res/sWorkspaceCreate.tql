@@ -1,0 +1,13 @@
+-- SetupConfig: {}
+create transformer on CK.sWorkspaceCreate
+as
+begin
+    inject "
+    declare @PageId int;
+    exec CK.sWebPageCreate @ActorId, 0, @WorkspaceName, @PageId output;" into "PreCreate";
+
+    in single part {insert into CK.tWorkspace}
+    begin
+        add column PageId = @PageId;
+    end
+end
