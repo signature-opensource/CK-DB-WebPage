@@ -6,7 +6,6 @@ namespace CK.DB.WebPage.Tests
 {
     public static class WebPageTableExtensions
     {
-
         public static async Task<WebPage?> GetWebPageByIdAsync( this WebPageTable @this, ISqlCallContext ctx, int pageId )
         {
             return await ctx.GetConnectionController( @this ).QuerySingleOrDefaultAsync<WebPage?>(
