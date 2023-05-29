@@ -2,7 +2,8 @@
 create procedure CK.sWebPageDestroy
 (
     @ActorId int,
-    @PageId int
+    @PageId int,
+    @WithChildren bit = 0
 )
 as
 begin
@@ -20,11 +21,30 @@ begin
         ;throw 50000, 'WebPage.AccessDenied', 1;
     end
 
+    if @WithChildren = 1
+    begin
+        declare @ChildId int;
+        declare CChildren cursor local static forward_only read_only for
+            select ChildId
+            from CK.vResPathAllChildren
+            where ResId = @PageId
+            order by len(ChildName) desc;
+
+        open CChildren;
+        fetch next from CChildren into @ChildId;
+        while @@fetch_status = 0
+        begin
+            exec CK.sWebPageDestroy @ActorId, @ChildId; -- no need to call recursive destroy
+            fetch next from CChildren into @ChildId;
+        end
+        close CChildren;
+        deallocate CChildren;
+    end
+
 	--<PreDestroy revert />
-    
+
     delete from CK.tWebPage where PageId = @PageId;
     exec CK.sResPathDestroy @PageId;
-
     -- Should remove Acl?
 	
 	--<PostDestroy />	

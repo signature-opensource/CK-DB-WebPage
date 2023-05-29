@@ -9,7 +9,7 @@ namespace CK.DB.WebPage
     [SqlObjectItem( "vWebPage" )]
     public abstract class WebPageTable : SqlTable
     {
-        void StObjConstruct( CK.DB.Res.ResPath.Package resPath )
+        void StObjConstruct( CK.DB.Res.ResPath.Package resPath, CK.DB.Acl.Package acl )
         {
         }
 
@@ -33,9 +33,10 @@ namespace CK.DB.WebPage
         /// This is possible only for page Administrator (i.e. the <paramref name="actorId"/> must have Administrator level (127) on the page Acl).
         /// </summary>
         /// <param name="ctx">The call context to use.</param>
-        /// <param name="webPageId">The acting user.</param>
+        /// <param name="pageId">The acting user.</param>
+        /// <param name="withChildren">If <see langword="true"/>, remove recursively all children of the webPage and the page. Else, remove only the page.</param>
         [SqlProcedure( "sWebPageDestroy" )]
-        public abstract Task DestroyWebPageAsync( ISqlCallContext ctx, int actorId, int pageId );
+        public abstract Task DestroyWebPageAsync( ISqlCallContext ctx, int actorId, int pageId, bool withChildren = false );
 
         /// <summary>
         /// Rename the WebPage and all the children web page path.
