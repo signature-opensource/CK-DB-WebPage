@@ -36,8 +36,6 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task workspace_page_have_same_alc_that_workspace_Async()
         {
-            //TODO: Check when the CK.DB.Workspace PreCreate fix (commit 31a737f) will be released.
-
             var workspaceTable = ObtainPackage<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )

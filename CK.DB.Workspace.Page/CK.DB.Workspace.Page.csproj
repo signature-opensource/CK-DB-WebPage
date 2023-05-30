@@ -6,8 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.Workspace" Version="5.0.0" />
-    <PackageReference Include="CK.SqlServer.Setup.Model" Version="23.0.0" />
+    <PackageReference Include="CK.DB.Workspace" Version="5.0.1--0026-develop" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="**\*.sql;**\*.tql;**\*.y4" Exclude="bin\**;obj\**;CodeCakeBuilder\**;packages\**;@(EmbeddedResource)" />
