@@ -7,7 +7,10 @@ begin
     select @PageId = PageId
         from CK.tWorkspace
         where WorkspaceId = @WorkspaceId;
+
+    " into "PreDestroy"
     
+    inject "
     exec CK.sWebPageDestroy @ActorId, @PageId, 1;
     
     " into "PostDestroy";
