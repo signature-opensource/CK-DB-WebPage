@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using CK.DB.Actor;
 using CK.DB.Acl;
+using System.Collections.Generic;
 
 namespace CK.DB.WebPage.Tests
 {
@@ -188,6 +189,86 @@ namespace CK.DB.WebPage.Tests
                     new { ResId = pageId } );
 
                 resId.Should().BeNull();
+            }
+        }
+
+        [Test]
+        public async Task destroy_webPage_without_children_do_not_destroy_children_Async()
+        {
+            var webPageTable = ObtainPackage<WebPageTable>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+
+                List<int> children = new()
+                {
+                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() ),
+                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() )
+                };
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid() ) );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid() ) );
+
+                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+
+                // Assert pages exists
+                (await webPageTable.GetWebPageByIdAsync( ctx, parentPageId )).Should().NotBeNull();
+                foreach( int childId in children )
+                {
+                    (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().NotBeNull();
+                }
+                (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
+
+                // Remove
+                await webPageTable.DestroyWebPageAsync( ctx, 1, parentPageId, withChildren: false );
+
+                // Assert pages exists
+                (await webPageTable.GetWebPageByIdAsync( ctx, parentPageId )).Should().BeNull();
+                foreach( int childId in children )
+                {
+                    (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().NotBeNull();
+                }
+                (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
+            }
+        }
+
+        [Test]
+        public async Task destroy_webPage_with_children_destroy_all_children_Async()
+        {
+            var webPageTable = ObtainPackage<WebPageTable>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+
+                List<int> children = new()
+                {
+                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() ),
+                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() )
+                };
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid() ) );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid() ) );
+
+                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+
+                // Assert pages exists
+                (await webPageTable.GetWebPageByIdAsync( ctx, parentPageId )).Should().NotBeNull();
+                foreach( int childId in children )
+                {
+                    (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().NotBeNull();
+                }
+                (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
+
+                // Remove
+                await webPageTable.DestroyWebPageAsync( ctx, 1, parentPageId, withChildren: true );
+
+                // Assert pages does not exists
+                (await webPageTable.GetWebPageByIdAsync( ctx, parentPageId )).Should().BeNull();
+                foreach( int childId in children )
+                {
+                    (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().BeNull();
+                }
+                (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
             }
         }
 
