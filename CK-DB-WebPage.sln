@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 		NuGet.config = NuGet.config
 		README.md = README.md
 		RepositoryInfo.xml = RepositoryInfo.xml
@@ -23,9 +24,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.Workspace.Page.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.Workspace.Page", "CK.DB.Workspace.Page\CK.DB.Workspace.Page.csproj", "{A2141FE3-5F9D-4626-BC63-BAD7AB19B41F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CK.DB.WebPage", "CK.DB.WebPage\CK.DB.WebPage.csproj", "{699B7D65-6310-455E-A7D7-8BB8BE3EC595}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.WebPage", "CK.DB.WebPage\CK.DB.WebPage.csproj", "{699B7D65-6310-455E-A7D7-8BB8BE3EC595}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CK.DB.WebPage.Tests", "Tests\CK.DB.WebPage.Tests\CK.DB.WebPage.Tests.csproj", "{C9989F4D-F172-43ED-B106-3025028E1D7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.WebPage.Tests", "Tests\CK.DB.WebPage.Tests\CK.DB.WebPage.Tests.csproj", "{C9989F4D-F172-43ED-B106-3025028E1D7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

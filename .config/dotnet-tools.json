@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "cksetup": {
+      "version": "19.0.1--0023-develop",
+      "commands": [
+        "cksetup"
+      ]
+    }
+  }
+}
