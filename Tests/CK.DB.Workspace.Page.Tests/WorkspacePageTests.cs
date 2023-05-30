@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CK.DB.WebPage.Tests;
 
 namespace CK.DB.Workspace.Page.Tests
 {
@@ -35,8 +36,19 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task workspace_page_have_same_alc_that_workspace_Async()
         {
-            // Now cannot works because the PreCreate fix in CK.DB.Workspace (commit 31a737f) is not on the release 5.0.0
-            throw new NotImplementedException();
+            //TODO: Check when the CK.DB.Workspace PreCreate fix (commit 31a737f) will be released.
+
+            var workspaceTable = ObtainPackage<WorkspaceTable>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+                int workspaceAclId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select AclId from CK.tWorkspace where WorkspaceId = @WorkspaceId;",
+                    new { workspace.WorkspaceId } );
+
+                (await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId ))!.AclId.Should().Be( workspaceAclId );
+            }
         }
 
         [Test]
@@ -48,19 +60,39 @@ namespace CK.DB.Workspace.Page.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+
+                // Create children webPage
                 var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
+                List<int> children = new()
+                {
+                    await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid() ),
+                    await webPageTable.CreateWebPageAsync( ctx, 1, webPage.PageId, GetNewGuid() ),
+                };
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid() ) );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid() ) );
+                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
 
-                await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid() );
-                int childWebpage = await webPageTable.CreateWebPageAsync( ctx, 1, webPage.PageId, GetNewGuid() );
-                await webPageTable.CreateWebPageAsync( ctx, 1, childWebpage, GetNewGuid() );
+                // Check if children exists
+                foreach( int childId in children )
+                {
+                    (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().NotBeNull();
+                }
+                (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
 
-                var siteMap = await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 );
-                siteMap.Should().HaveCount( 4 );
+                (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 )).Should().HaveCount( 5 );
 
+                // Destroy workspace
                 await workspaceTable.DestroyWorkspaceAsync( ctx, 1, workspace.WorkspaceId );
 
-                siteMap = await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 );
-                siteMap.Should().BeEmpty();
+                // Check if children exists
+                (await webPageTable.GetWebPageByIdAsync( ctx, webPage.PageId )).Should().BeNull();
+                foreach( int childId in children )
+                {
+                    (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().BeNull();
+                }
+                (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
+
+                (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 )).Should().BeEmpty();
             }
         }
 
@@ -101,11 +133,15 @@ namespace CK.DB.Workspace.Page.Tests
         {
             var workspaceTable = ObtainPackage<WorkspaceTable>();
             var userTable = ObtainPackage<UserTable>();
+            var aclTalbe = ObtainPackage<AclTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+
                 int userId = await userTable.CreateUserAsync( ctx, 1, GetNewGuid() );
-                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, userId, GetNewGuid() );
+                var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
+                await aclTalbe.AclGrantSetAsync( ctx, 1, webPage!.AclId, userId, "Viewer", 16 );
 
                 (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).Should().NotBeEmpty().And.HaveCount( 1 );
             }

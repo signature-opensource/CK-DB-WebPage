@@ -11,8 +11,9 @@ namespace CK.DB.Workspace.Page.Tests
         {
             return await ctx.GetConnectionController( @this ).QueryAsync<SiteMap>(
                 @"select usm.WorkspaceId, usm.ResPath, usm.GrantLevel, rp.ResId as PageId
-                      from CK.fUserSiteMap(1) usm
-                      inner join CK.tResPath rp on usm.ResPath like rp.ResPath;",
+                      from CK.fUserSiteMap(@UserId) usm
+                      inner join CK.tResPath rp on usm.ResPath like rp.ResPath
+                      where usm.WorkspaceId = @WorkspaceId;",
                 new { WorkspaceId = workspaceId, @UserId = userId } );
         }
 
@@ -27,7 +28,7 @@ namespace CK.DB.Workspace.Page.Tests
         public static async Task<WebPage?> GetWebPageFromWorkspaceIdAsync( this WorkspaceTable @this, ISqlCallContext ctx, int workspaceId )
         {
             return await ctx.GetConnectionController( @this ).QuerySingleOrDefaultAsync<WebPage?>(
-                @"select wp.PageId, wp.AclId, wp.
+                @"select wp.PageId, wp.AclId
                       from CK.tWorkspace w
                       inner join CK.tWebPage wp on w.PageId = wp.PageId
                       where w.WorkspaceId = @WorkspaceId;",
