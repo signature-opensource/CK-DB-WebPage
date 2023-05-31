@@ -40,6 +40,10 @@ begin
         close CChildren;
         deallocate CChildren;
     end
+    else if (exists (select 1 from CK.vResPathAllChildren where ResId = @PageId))
+    begin
+        ;throw 50000, 'WebPage.UnauthorizeDestroyPageWithChildren', 1;
+    end
 
 	--<PreDestroy revert />
 
