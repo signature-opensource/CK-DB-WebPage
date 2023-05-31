@@ -11,7 +11,7 @@ return
     as (
         select WorkspaceId, PageId
         from CK.tWorkspace
-        where WorkspaceId > 0
+        where WorkspaceId > 0 and PageId > 0
     )
 
     select q.WorkspaceId
