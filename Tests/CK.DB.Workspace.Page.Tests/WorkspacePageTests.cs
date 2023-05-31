@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CK.DB.Zone;
 
 namespace CK.DB.Workspace.Page.Tests
 {
@@ -248,6 +249,56 @@ namespace CK.DB.Workspace.Page.Tests
                 {
                     sitemap.Should().Contain( siteMapitem => siteMapitem.PageId == webPageId );
                 }
+            }
+        }
+
+        [Test]
+        public async Task rename_workspacePage_update_workspace_webPage_ResName_Async()
+        {
+            var workspaceTable = ObtainPackage<WorkspaceTable>();
+            var workspacePagePkg = ObtainPackage<Package>();
+            var groupNamePkg = ObtainPackage<Group.SimpleNaming.Package>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                async Task<string> GetWebPageNameAsync( int workspaceId )
+                {
+                    return await ctx.GetConnectionController( workspacePagePkg ).QuerySingleOrDefaultAsync<string>(
+                    @"select wp.PageName
+                          from CK.vWebPage wp
+                          inner join CK.tWorkspace w on wp.PageId = w.PageId
+                          where w.WorkspaceId = @WorkspaceId;",
+                        new { WorkspaceId = workspaceId } );
+                };
+
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+                await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
+
+                (await GetWebPageNameAsync( workspace.WorkspaceId )).Should().Be( workspace.Name );
+
+                string workspaceName = await groupNamePkg.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, GetNewGuid() );
+
+                (await GetWebPageNameAsync( workspace.WorkspaceId )).Should().Be( workspaceName );
+            }
+        }
+
+        [TestCase( "te st" )]
+        [TestCase( "te$st" )]
+        [TestCase( "tooLongWorkspaceNameToPlugAsWorkspacePage" )]
+        [TestCase( "te*st" )]
+        public async Task rename_workspacePage_with_invalid_name_throw_an_error_Async( string newWorkspaceName )
+        {
+            var workspaceTable = ObtainPackage<WorkspaceTable>();
+            var workspacePagePkg = ObtainPackage<Package>();
+            var groupNamePkg = ObtainPackage<Group.SimpleNaming.Package>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+                await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
+
+                await groupNamePkg.Invoking( table => table.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, newWorkspaceName ) )
+                                  .Should().ThrowAsync<Exception>();
             }
         }
 

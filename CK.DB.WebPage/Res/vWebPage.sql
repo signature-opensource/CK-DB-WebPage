@@ -3,7 +3,7 @@ create view CK.vWebPage
 as
     select wp.PageId
           ,wp.AclId
-          ,right(rppp.ResPath, charindex('/', reverse(rppp.ResPath)) - 1) as PageName
+          ,right(rp.ResPath, charindex('/', reverse(rp.ResPath)) - 1) as PageName
           ,IsNull(rppp.ParentResId, 0) as ParentPageId
     from CK.tWebPage wp
     inner join CK.tResPath rp

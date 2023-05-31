@@ -1,0 +1,23 @@
+-- SetupConfig: {}
+create transformer on CK.sGroupGroupNameSet
+as
+begin
+    inject "
+    -- If the group is a WorkspacePage, check if the new name is a valid WorkspacePage name.
+    if (exists (select 1 from CK.tWorkspace where WorkspaceId = @GroupId and PageId > 0))
+    begin
+        if (len(@GroupNameCorrected) = 0 or len(@GroupNameCorrected) > 32 or patindex('%[^0-9a-zA-Z-._,;]%', @GroupNameCorrected) > 0)
+        begin
+            ;throw 50000, 'GroupName.InvalidWorkspacePageName', 1;
+        end
+
+        declare @PageId int;
+        select @PageId = PageId
+            from CK.tWorkspace
+            where WorkspaceId = @GroupId;
+
+        declare @NewWebPagePath varchar(128);
+        exec CK.sWebPageRename @ActorId, @PageId, @GroupNameCorrected, @NewWebPagePath;
+    end
+    " into "PreNameSet";
+end
