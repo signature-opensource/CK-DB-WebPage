@@ -1,0 +1,11 @@
+-- SetupConfig: {}
+create transformer on CK.sWorkspaceCreate
+as
+begin
+    add parameter @ParentWorkspaceId int = 0;
+
+    in single statement {exec CK.sZoneCreate}
+    begin
+        inject ", @ParentWorkspaceId" after single {@WorkspaceIdResult output}
+    end
+end

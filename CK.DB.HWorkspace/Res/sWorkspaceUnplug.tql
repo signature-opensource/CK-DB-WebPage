@@ -1,0 +1,11 @@
+-- SetupConfig: {}
+create transformer on CK.sWorkspaceUnplug
+as
+begin
+    inject "
+    if (exists (select 1 from CK.vZone where ZoneId = @WorkspaceId and ParentZoneId > 0))
+    begin
+        ;throw 50000, 'Security.CannotDestroyWorkspaceWithSubWorkspaces', 1;
+    end
+    " into "PreClearPreferredWorkspaceId";
+end
