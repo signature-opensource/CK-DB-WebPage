@@ -1,0 +1,35 @@
+-- SetupConfig: {}
+create transformer on CK.sZoneMove
+as
+begin
+    inject "
+    -- If the moved zone is a workspace
+    if exists (select 1 from CK.tWorkspace where WorkspaceId = @ZoneId)
+    begin
+        -- Check if @Actor has right to move the workspace
+        if exists (select 1 from CK.tWorkspace w
+                   inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
+                   where aa.GrantLevel < 112 /* SafeAdministrator */)
+        begin
+            ;throw 50000, 'HWorkspace.UnauthorizedToMoveWorkspace', 1;
+        end
+
+        -- Check if @Actor has right to move from the parent workspace
+        if exists (select 1 from CK.tWorkspace w
+                   inner join CK.vZone z on w.WorkspaceId = z.ParentZoneId
+                   inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
+                   where aa.GrantLevel < 64 /* Editor */)
+        begin
+            ;throw 50000, 'HWorkspace.UnautorizedToMoveWorkspace', 1;
+        end
+
+        -- Check if @Actor has right to move to the new parent workspace
+        if exists (select 1 from CK.tWorkspace w
+                   inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
+                   where aa.GrantLevel < 64 /* Editor */)
+        begin
+            ;throw 50000, 'HWorkspace.UnautorizedToMoveWorkspace', 1;
+        end
+    end
+    " into "PreZoneMove";
+end
