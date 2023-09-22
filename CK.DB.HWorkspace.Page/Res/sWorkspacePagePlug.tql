@@ -1,0 +1,20 @@
+-- SetupConfig: {}
+create transformer on CK.sWorkspacePagePlug
+as
+begin
+    inject "
+    declare @ParentPageId int = 0;
+
+    declare @ParentWorkspaceId int = (select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId);
+    if @ParentWorkspaceId > 0
+    begin
+       set @ParentPageId = (select PageId from CK.tWorkspace where WorkspaceId = @ParentWorkspaceId);
+    end
+
+    " into "PrePlug";
+
+    in single statement {exec CK.sWebPageCreate}
+    begin
+        replace single {0} with "@ParentPageId";
+    end
+end

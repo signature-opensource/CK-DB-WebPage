@@ -1,0 +1,25 @@
+-- SetupConfig: {}
+create transformer on CK.sZoneMove
+as
+begin
+
+    inject "
+    if @IsWorkspaceMove = 1
+    begin
+        declare @PageId int = (select PageId from CK.tWorkspace where WorkspaceId = @ZoneId);
+
+        declare @NewResPath varchar(128) = 
+            -- ResPath of the web page of the new parent workspace
+            (select rp.ResPath
+                from CK.tWorkspace w
+                inner join CK.tResPath rp on w.PageId = rp.ResId
+                where w.WorkspaceId = @NewParentZoneId)
+            -- ResPath separator
+            + '/' +
+            -- Page name without all the path
+            (select right(ResPath, charindex('/', reverse(ResPath)) - 1) from CK.tResPath where ResId = @PageId);
+
+        exec CK.sResPathRename @PageId, @NewResPath, 1;
+    end
+    " into "PostZoneMove";
+end
