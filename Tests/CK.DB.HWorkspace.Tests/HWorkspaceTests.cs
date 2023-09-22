@@ -1,14 +1,14 @@
-using CK.Core;
-using static CK.Testing.DBSetupTestHelper;
-using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
-using CK.SqlServer;
-using Dapper;
-using FluentAssertions;
 using CK.DB.Acl;
 using CK.DB.Actor;
 using CK.DB.HZone;
+using CK.SqlServer;
+using static CK.Testing.DBSetupTestHelper;
+using Dapper;
+using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using System;
+using System.Threading.Tasks;
 
 namespace CK.DB.HWorkspace.Tests
 {
@@ -18,7 +18,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task create_workspace_with_parent_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -34,7 +35,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task unplug_workspace_without_children_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -51,7 +53,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task unplug_workspace_with_children_throw_an_error_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -66,7 +69,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task not_safe_administrator_of_workspace_cannot_move_Async()
         {
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -80,7 +84,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task safe_administrator_of_workspace_can_move_Async()
         {
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -94,7 +99,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task not_editor_of_origine_parent_workspace_cannot_move_Async()
         {
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -108,7 +114,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task editor_of_origine_parent_workspace_can_move_Async()
         {
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -122,7 +129,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task not_editor_of_destination_parent_workspace_cannot_move_Async()
         {
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -136,7 +144,8 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task editor_of_destination_parent_workspace_can_move_Async()
         {
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -146,15 +155,48 @@ namespace CK.DB.HWorkspace.Tests
                                .Should().ThrowAsync<Exception>();
             }
         }
+
+        [Test]
+        public async Task cannot_move_workspace_in_Zone_Async()
+        {
+            using var services = TestHelper.CreateAutomaticServices();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                var parentWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid(), parentWorkspace.WorkspaceId );
+
+                int parentId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ZoneId from CK.vGroup where GroupId = @WorkspaceId;",
+                    new { workspace.WorkspaceId } );
+
+                parentId.Should().Be( parentWorkspace.WorkspaceId );
+
+                var parentZoneId = await zoneTable.CreateZoneAsync( ctx, 1 );
+
+                await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentZoneId ) )
+                               .Should().ThrowAsync<Exception>();
+
+                parentId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ZoneId from CK.vGroup where GroupId = @WorkspaceId;",
+                    new { workspace.WorkspaceId } );
+
+                parentId.Should().Be( parentWorkspace.WorkspaceId );
+            }
+        }
+
         static async Task<(int OrigineParentId, int DestinationParentId, int ChildId, int UserId)> HiearchicalWorkspacesAsync( ISqlCallContext ctx,
                                                                                                                                byte userOrigineParentGrantLevel,
                                                                                                                                byte userDestinationParentGrantLevel,
                                                                                                                                byte userChildGrantLevel )
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var userTable = ObtainPackage<UserTable>();
-            var aclTable = ObtainPackage<AclTable>();
-            var zoneTable = ObtainPackage<ZoneTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var userTable = services.GetRequiredService<UserTable>();
+            var aclTable = services.GetRequiredService<AclTable>();
+            var zoneTable = services.GetRequiredService<ZoneTable>();
 
             int userId = await userTable.CreateUserAsync( ctx, 1, Guid.NewGuid().ToString() );
 
@@ -182,10 +224,6 @@ namespace CK.DB.HWorkspace.Tests
             return (origineWorkspace.WorkspaceId, destinationWorkspace.WorkspaceId, childWorkspace.WorkspaceId, userId);
         }
 
-        static T ObtainPackage<T>() where T : SqlPackage
-        {
-            return TestHelper.StObjMap.StObjs.Obtain<T>()
-                ?? throw new NullReferenceException( $"Cannot obtain {typeof( T ).Name} package." );
-        }
+        static string GetNewGuid( int length = 32 ) => Guid.NewGuid().ToString().Substring( 0, length );
     }
 }
