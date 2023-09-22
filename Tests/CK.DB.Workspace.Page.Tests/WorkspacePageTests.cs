@@ -7,11 +7,11 @@ using CK.SqlServer;
 using static CK.Testing.DBSetupTestHelper;
 using Dapper;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CK.DB.Zone;
 
 namespace CK.DB.Workspace.Page.Tests
 {
@@ -21,8 +21,9 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task create_workspace_creates_webPage_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -39,8 +40,9 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task workspace_page_have_same_alc_that_workspace_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -58,9 +60,10 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_page_with_force_unplug_destroy_all_webPages_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -105,8 +108,9 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_page_without_children_WebPage_and_force_unplug_0_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -131,8 +135,9 @@ namespace CK.DB.Workspace.Page.Tests
         [TestCase( "te*st" )]
         public async Task workspace_with_invalid_webPage_name_cannot_be_used_as_workspacePage_Async( string workspaceName )
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -147,9 +152,10 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_with_children_page_thow_an_error_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -167,10 +173,11 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task invalid_user_cannot_obtain_workspace_siteMap_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var userTable = ObtainPackage<UserTable>();
-            var aclTable = ObtainPackage<AclTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var userTable = services.GetRequiredService<UserTable>();
+            var aclTable = services.GetRequiredService<AclTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -201,10 +208,11 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task workspace_viewer_can_obtain_siteMap_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var userTable = ObtainPackage<UserTable>();
-            var aclTalbe = ObtainPackage<AclTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var userTable = services.GetRequiredService<UserTable>();
+            var aclTalbe = services.GetRequiredService<AclTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -222,10 +230,11 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task get_workspace_webPage_and_children_pages_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var webPageTable = ObtainPackage<WebPageTable>();
-            var userTable = ObtainPackage<UserTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
+            var userTable = services.GetRequiredService<UserTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -255,18 +264,19 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task rename_workspacePage_update_workspace_webPage_ResName_Async()
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var groupNamePkg = ObtainPackage<Group.SimpleNaming.Package>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var groupNamePkg = services.GetRequiredService<Group.SimpleNaming.Package>();
 
             using( SqlStandardCallContext ctx = new() )
             {
-                async Task<string> GetWebPageNameAsync( int workspaceId )
+                async Task<string> GetWebPageResPathAsync( int workspaceId )
                 {
                     return await ctx.GetConnectionController( workspacePagePkg ).QuerySingleOrDefaultAsync<string>(
-                    @"select wp.PageName
-                          from CK.vWebPage wp
-                          inner join CK.tWorkspace w on wp.PageId = w.PageId
+                    @"select rp.ResPath
+                          from CK.tResPath rp
+                          inner join CK.tWorkspace w on rp.ResId = w.PageId
                           where w.WorkspaceId = @WorkspaceId;",
                         new { WorkspaceId = workspaceId } );
                 };
@@ -274,11 +284,11 @@ namespace CK.DB.Workspace.Page.Tests
                 var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
                 await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
-                (await GetWebPageNameAsync( workspace.WorkspaceId )).Should().Be( workspace.Name );
+                (await GetWebPageResPathAsync( workspace.WorkspaceId )).Should().EndWith( '/' + workspace.Name );
 
                 string workspaceName = await groupNamePkg.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, GetNewGuid() );
 
-                (await GetWebPageNameAsync( workspace.WorkspaceId )).Should().Be( workspaceName );
+                (await GetWebPageResPathAsync( workspace.WorkspaceId )).Should().EndWith( '/' + workspaceName );
             }
         }
 
@@ -288,9 +298,10 @@ namespace CK.DB.Workspace.Page.Tests
         [TestCase( "te*st" )]
         public async Task rename_workspacePage_with_invalid_name_throw_an_error_Async( string newWorkspaceName )
         {
-            var workspaceTable = ObtainPackage<WorkspaceTable>();
-            var workspacePagePkg = ObtainPackage<Package>();
-            var groupNamePkg = ObtainPackage<Group.SimpleNaming.Package>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var workspaceTable = services.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = services.GetRequiredService<Package>();
+            var groupNamePkg = services.GetRequiredService<Group.SimpleNaming.Package>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -302,15 +313,9 @@ namespace CK.DB.Workspace.Page.Tests
             }
         }
 
-        static T ObtainPackage<T>() where T : SqlPackage
-        {
-            return TestHelper.StObjMap.StObjs.Obtain<T>()
-                ?? throw new NullReferenceException( $"Cannot obtain {typeof( T ).Name} package." );
-        }
-
         /// <summary>
         /// Generate a new guid truncated at 32 characters.
         /// </summary>
-        static string GetNewGuid() => Guid.NewGuid().ToString().Substring( 0, 32 );
+        static string GetNewGuid( int length = 32 ) => Guid.NewGuid().ToString().Substring( 0, length );
     }
 }

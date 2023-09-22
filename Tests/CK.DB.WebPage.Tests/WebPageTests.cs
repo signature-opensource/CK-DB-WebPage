@@ -1,14 +1,14 @@
-using CK.Core;
+using CK.DB.Acl;
+using CK.DB.Actor;
 using CK.SqlServer;
 using static CK.Testing.DBSetupTestHelper;
 using Dapper;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
-using System.Threading.Tasks;
-using CK.DB.Actor;
-using CK.DB.Acl;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CK.DB.WebPage.Tests
 {
@@ -19,7 +19,8 @@ namespace CK.DB.WebPage.Tests
         [TestCase( 0 )]
         public async Task invaid_actor_cannot_create_page_Async( int actorId )
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -33,7 +34,8 @@ namespace CK.DB.WebPage.Tests
         [TestCase( int.MaxValue )]
         public async Task invaid_parent_page_throw_an_error_Async( int parentPageId )
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -53,7 +55,8 @@ namespace CK.DB.WebPage.Tests
         [TestCase( "te=st" )]
         public async Task invalid_page_name_thow_an_error_Async( string pageName )
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -66,9 +69,10 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task not_Contributor_on_parent_page_acl_cannot_create_page_Async()
         {
-            var userTable = ObtainPackage<UserTable>();
-            var webPageTable = ObtainPackage<WebPageTable>();
-            var aclTable = ObtainPackage<AclTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var userTable = services.GetRequiredService<UserTable>();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
+            var aclTable = services.GetRequiredService<AclTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -91,7 +95,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_creates_ResPath_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -102,7 +107,7 @@ namespace CK.DB.WebPage.Tests
 
                 webPage.Should().NotBeNull();
                 webPage!.PageId.Should().Be( pageId );
-                webPage!.PageName.Should().Be( pageName );
+                webPage!.ResPath.Should().EndWith( '/' + pageName );
                 webPage!.ParentPageId.Should().Be( 0 );
 
                 int? resId = await ctx.GetConnectionController( webPageTable ).QuerySingleOrDefaultAsync<int?>(
@@ -116,7 +121,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_without_parent_and_acl_creates_new_acl_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -134,7 +140,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_with_parent_set_parent_aclId_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -152,7 +159,7 @@ namespace CK.DB.WebPage.Tests
                 webPage.Should().NotBeNull();
                 webPage!.PageId.Should().Be( pageId );
                 webPage.PageId.Should().NotBe( parentWebPage.PageId );
-                webPage.PageName.Should().Be( pageName );
+                webPage.ResPath.Should().EndWith( '/' + pageName );
                 webPage.ParentPageId.Should().Be( parentWebPage.PageId );
                 webPage.AclId.Should().Be( parentWebPage.AclId );
             }
@@ -161,7 +168,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task destroy_WebPage_destroy_ResPath_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -195,7 +203,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task destroy_webPage_with_children_to_1_destroy_all_children_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -235,7 +244,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task destroy_WebPage_with_with_children_and_force_destroy_to_0_throw_an_error_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -251,7 +261,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task view_right_informations_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
@@ -262,7 +273,7 @@ namespace CK.DB.WebPage.Tests
 
                 page.Should().NotBeNull();
                 page!.PageId.Should().Be( pageId );
-                page!.PageName.Should().Be( pageName );
+                page!.ResPath.Should().EndWith( '/' + pageName );
                 page!.ParentPageId.Should().Be( 0 );
 
                 var res = await ctx.GetConnectionController( webPageTable ).QuerySingleOrDefaultAsync<(int ResId, string ResPath)>(
@@ -280,7 +291,7 @@ namespace CK.DB.WebPage.Tests
 
                 childPage.Should().NotBeNull();
                 childPage!.ParentPageId!.Should().Be( pageId );
-                childPage!.PageName.Should().Be( childPageName );
+                childPage!.ResPath.Should().EndWith( '/' + childPageName );
                 childPage!.ParentPageId.Should().Be( pageId );
                 childPage!.AclId.Should().Be( page.AclId );
 
@@ -297,7 +308,8 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task rename_WebPage_rename_path_of_children_Async()
         {
-            var webPageTable = ObtainPackage<WebPageTable>();
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
 
             async Task<string?> GetPagePathNameAsync( ISqlCallContext ctx, int pageId )
             {
@@ -328,12 +340,6 @@ namespace CK.DB.WebPage.Tests
 
                 (await GetPagePathNameAsync( ctx, childPageId )).Should().NotBeNull().And.Be( $"P/{parentPageName}/{childPageName}" );
             }
-        }
-
-        static T ObtainPackage<T>() where T : SqlPackage
-        {
-            return TestHelper.StObjMap.StObjs.Obtain<T>()
-                ?? throw new NullReferenceException( $"Cannot obtain {typeof( T ).Name} package." );
         }
 
         /// <summary>
