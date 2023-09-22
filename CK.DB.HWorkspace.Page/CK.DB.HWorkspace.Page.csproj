@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CK.DB.HWorkspace\CK.DB.HWorkspace.csproj" />
+    <ProjectReference Include="..\CK.DB.Workspace.Page\CK.DB.Workspace.Page.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="**\*.sql;**\*.tql;**\*.y4" Exclude="bin\**;obj\**;CodeCakeBuilder\**;packages\**;@(EmbeddedResource)" />
+    <None Remove="Res\**\*.sql" />
+    <None Remove="Res\**\*.tql" />
+  </ItemGroup>
+
+</Project>
