@@ -3,9 +3,19 @@ create transformer on CK.sZoneMove
 as
 begin
     inject "
+    -- Bit that indicate if the the moved Zone is a Workspace: 0 = Zone, 1 = Workspace
+    declare @IsWorkspaceMove bit = 0;
+
     -- If the moved zone is a workspace
     if exists (select 1 from CK.tWorkspace where WorkspaceId = @ZoneId)
     begin
+        set @IsWorkspaceMove = 1;
+
+        if not exists (select 1 from CK.tWorkspace where WorkspaceId = @NewParentZoneId)
+        begin
+            ;throw 5000, 'HWorkspace.CannotMoveWorkspaceToZone', 1;
+        end
+
         -- Check if @Actor has right to move the workspace
         if exists (select 1 from CK.tWorkspace w
                    inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
@@ -30,6 +40,8 @@ begin
         begin
             ;throw 50000, 'HWorkspace.UnautorizedToMoveWorkspace', 1;
         end
+
+        --<PreWorkspaceMove>
     end
     " into "PreZoneMove";
 end

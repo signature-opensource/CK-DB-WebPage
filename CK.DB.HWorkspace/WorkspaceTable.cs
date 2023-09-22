@@ -19,6 +19,6 @@ namespace CK.DB.HWorkspace
         /// <inheritdoc cref="Workspace.WorkspaceTable.CreateWorkspaceAsync(ISqlCallContext, int, string)"/>
         /// <param name="parentWorkspaceId">The parent workspace identifier.</param>
         [SqlProcedure( "transform:sWorkspaceCreate" )]
-        public abstract Task<NamedWorkspace> CreateWorkspaceAsync( ISqlCallContext ctx, int actorId, string workspaceName, int parentWorkspaceId );
+        public abstract Task<NamedWorkspace> CreateWorkspaceAsync( ISqlCallContext ctx, int actorId, string workspaceName, int parentWorkspaceId = 0 );
     }
 }
