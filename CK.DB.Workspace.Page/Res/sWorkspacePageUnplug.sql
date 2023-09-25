@@ -9,20 +9,24 @@ as
 begin
     --[beginsp]
 
-    --<PreUnplug />
-
     declare @PageId int;
     select @PageId = PageId
         from CK.tWorkspace
         where WorkspaceId = @WorkspaceId;
 
-    update CK.tWorkspace
-        set PageId = 0
-        where WorkspaceId = @WorkspaceId;
+    -- If PageId is greater that 0 then the Workspace had a WebPage. Then unplug it, else no action required.
+    if @PageId > 0
+    begin
+        --<PreUnplug />
 
-    exec CK.sWebPageDestroy @ActorId, @PageId, @ForceUnplug;
+        update CK.tWorkspace
+            set PageId = 0
+            where WorkspaceId = @WorkspaceId;
 
-    --<PostUnplug />
+        exec CK.sWebPageDestroy @ActorId, @PageId, @ForceUnplug;
+
+        --<PostUnplug />
+    end
 
     --[endsp]
 end

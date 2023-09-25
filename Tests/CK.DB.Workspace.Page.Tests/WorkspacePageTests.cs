@@ -1,4 +1,3 @@
-using CK.Core;
 using CK.DB.Acl;
 using CK.DB.Actor;
 using CK.DB.WebPage;
@@ -310,6 +309,64 @@ namespace CK.DB.Workspace.Page.Tests
 
                 await groupNamePkg.Invoking( table => table.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, newWorkspaceName ) )
                                   .Should().ThrowAsync<Exception>();
+            }
+        }
+
+        [Test]
+        public async Task plug_workspace_page_is_idempotent_Async()
+        {
+            using var service = TestHelper.CreateAutomaticServices();
+            var workspaceTable = service.GetRequiredService<WorkspaceTable>();
+            var workspacePagePackage = service.GetRequiredService<Package>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                var workspace = await workspaceTable.CreateWorkspaceAsync ( ctx, 1, GetNewGuid() );
+
+                var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
+                webPage.Should().NotBeNull().And.BeEquivalentTo( new WorkspaceTableExtensions.WebPage { PageId = 0, AclId = 0 } );
+
+                int previousPageId = 0;
+                for( int i = 0; i < 10; i++ )
+                {
+                    int pageId = await workspacePagePackage.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
+                    pageId.Should().BeGreaterThan( 0 );
+
+                    webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
+                    webPage.Should().NotBeNull();
+                    webPage!.PageId.Should().Be( pageId );
+
+                    if( previousPageId > 0 )
+                    {
+                        previousPageId.Should().Be( pageId );
+                    }
+                    previousPageId = pageId;
+                }
+            }
+        }
+
+        [Test]
+        public async Task unplug_workspace_page_is_idempotent_Async()
+        {
+            using var service = TestHelper.CreateAutomaticServices();
+            var workspaceTable = service.GetRequiredService<WorkspaceTable>();
+            var workspacePagePkg = service.GetRequiredService<Package>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
+                int pageId = await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
+
+                var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
+                webPage.Should().NotBeNull();
+                webPage!.PageId.Should().Be( pageId );
+
+                for( int i = 0; i < 10; i++ )
+                {
+                    await workspacePagePkg.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
+                    webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
+                    webPage.Should().NotBeNull().And.BeEquivalentTo( new WorkspaceTableExtensions.WebPage { PageId = 0, AclId = 0 } );
+                }
             }
         }
 
