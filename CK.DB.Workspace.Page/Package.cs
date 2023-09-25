@@ -14,9 +14,24 @@ namespace CK.DB.Workspace.Page
         {
         }
 
+        /// <summary>
+        /// Plug a WebPage to the Workspace.
+        /// If the Workspace already have a WebPage, then it do not create a new WebPage.
+        /// </summary>
+        /// <param name="ctx">The call context.</param>
+        /// <param name="actorId">The Actor identifier.</param>
+        /// <param name="workspaceId">The Workspace identifier.</param>
+        /// <returns>The identifier of the Workspace WebPage.</returns>
         [SqlProcedure( "sWorkspacePagePlug" )]
-        public abstract Task PlugWorkspacePageAsync( ISqlCallContext ctx, int actorId, int workspaceId );
+        public abstract Task<int> PlugWorkspacePageAsync( ISqlCallContext ctx, int actorId, int workspaceId );
 
+        /// <summary>
+        /// Unplug the WebPage to the Workspace.
+        /// </summary>
+        /// <param name="ctx">The call context.</param>
+        /// <param name="actorId">The Actor identifier.</param>
+        /// <param name="workspaceId">The WorkspaceIdentifier.</param>
+        /// <param name="forceUnplug">If <see langword="true"/>, remove recursively all sub WebPage of the Workspace. Else, if <see langword="false"/> the Workspace have sub WebPage, throw an error.</param>
         [SqlProcedure( "sWorkspacePageUnplug" )]
         public abstract Task UnplugWorkspacePageAsync( ISqlCallContext ctx, int actorId, int workspaceId, bool forceUnplug = false );
     }
