@@ -13,13 +13,13 @@ begin
 
         if not exists (select 1 from CK.tWorkspace where WorkspaceId = @NewParentZoneId)
         begin
-            ;throw 5000, 'HWorkspace.CannotMoveWorkspaceToZone', 1;
+            ;throw 50000, 'HWorkspace.CannotMoveWorkspaceToZone', 1;
         end
 
         -- Check if @Actor has right to move the workspace
         if exists (select 1 from CK.tWorkspace w
                    inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
-                   where aa.GrantLevel < 112 /* SafeAdministrator */)
+                   where w.WorkspaceId = @ZoneId and aa.GrantLevel < 112 /* SafeAdministrator */)
         begin
             ;throw 50000, 'HWorkspace.UnauthorizedToMoveWorkspace', 1;
         end
@@ -28,7 +28,7 @@ begin
         if exists (select 1 from CK.tWorkspace w
                    inner join CK.vZone z on w.WorkspaceId = z.ParentZoneId
                    inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
-                   where aa.GrantLevel < 64 /* Editor */)
+                   where z.ZoneId = @ZoneId and aa.GrantLevel < 64 /* Editor */)
         begin
             ;throw 50000, 'HWorkspace.UnautorizedToMoveWorkspace', 1;
         end
@@ -36,12 +36,12 @@ begin
         -- Check if @Actor has right to move to the new parent workspace
         if exists (select 1 from CK.tWorkspace w
                    inner join CK.vAclActor aa on w.AclId = aa.AclId and aa.ActorId = @ActorId
-                   where aa.GrantLevel < 64 /* Editor */)
+                   where w.WorkspaceId = @NewParentZoneId and aa.GrantLevel < 64 /* Editor */)
         begin
             ;throw 50000, 'HWorkspace.UnautorizedToMoveWorkspace', 1;
         end
 
-        --<PreWorkspaceMove>
+        --<PreWorkspaceMove />
     end
     " into "PreZoneMove";
 end
