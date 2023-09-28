@@ -91,8 +91,9 @@ namespace CK.DB.HWorkspace.Tests
             {
                 var (owId, dwId, cId, userId) = await HiearchicalWorkspacesAsync( ctx, 127, 127, 112 /* SafeAdministrator */ );
 
-                await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
-                               .Should().ThrowAsync<Exception>();
+                await zoneTable.MoveZoneAsync( ctx, userId, cId, dwId );
+
+
             }
         }
 
@@ -106,8 +107,18 @@ namespace CK.DB.HWorkspace.Tests
             {
                 var (owId, dwId, cId, userId) = await HiearchicalWorkspacesAsync( ctx, 32 /* Contributor */, 127, 112 );
 
+                int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( owId );
+
                 await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
                                .Should().ThrowAsync<Exception>();
+
+                parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( owId );
             }
         }
 
@@ -121,8 +132,17 @@ namespace CK.DB.HWorkspace.Tests
             {
                 var (owId, dwId, cId, userId) = await HiearchicalWorkspacesAsync( ctx, 64 /* Editor */, 127, 112 );
 
-                await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
-                               .Should().ThrowAsync<Exception>();
+                int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( owId );
+
+                await zoneTable.MoveZoneAsync( ctx, userId, cId, dwId );
+
+                parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( dwId );
             }
         }
 
@@ -136,8 +156,18 @@ namespace CK.DB.HWorkspace.Tests
             {
                 var (owId, dwId, cId, userId) = await HiearchicalWorkspacesAsync( ctx, 64, 32 /* Contributor */, 112 );
 
+                int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( owId );
+
                 await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
                                .Should().ThrowAsync<Exception>();
+
+                parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( owId );
             }
         }
 
@@ -151,8 +181,17 @@ namespace CK.DB.HWorkspace.Tests
             {
                 var (owId, dwId, cId, userId) = await HiearchicalWorkspacesAsync( ctx, 64, 64 /* Editor */, 112 );
 
-                await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
-                               .Should().ThrowAsync<Exception>();
+                int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( owId );
+
+                await zoneTable.MoveZoneAsync( ctx, userId, cId, dwId );
+
+                parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
+                    new { WorkspaceId = cId } );
+                parentZoneId.Should().Be( dwId );
             }
         }
 
@@ -222,6 +261,32 @@ namespace CK.DB.HWorkspace.Tests
             await aclTable.AclGrantSetAsync( ctx, 1, aclId, userId, "Grant user to workspace", userChildGrantLevel );
 
             return (origineWorkspace.WorkspaceId, destinationWorkspace.WorkspaceId, childWorkspace.WorkspaceId, userId);
+        }
+
+        [Test]
+        public async Task simple_workspace_admin_cannot_move_sub_workspace_to_parent_workspace_0_Async()
+        {
+            using var services = TestHelper.CreateAutomaticServices();
+            var userTable = services.GetRequiredService<CK.DB.Actor.UserTable>();
+            var aclTable = services.GetRequiredService<CK.DB.Acl.AclTable>();
+            var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
+            var zoneTable = services.GetRequiredService<CK.DB.HZone.ZoneTable>();
+
+            using( SqlStandardCallContext ctx = new( TestHelper.Monitor ) )
+            {
+                int userId = await userTable.CreateUserAsync( ctx, 1, GetNewGuid() );
+                await aclTable.AclGrantSetAsync( ctx, 1, 1, userId, "Safe Administrator", 112 );
+                var parentWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, userId, GetNewGuid() );
+                var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, userId, GetNewGuid(), parentWorkspace.WorkspaceId );
+
+                await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, workspace.WorkspaceId, 0 ) )
+                    .Should().ThrowAsync<Exception>();
+
+                (await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
+                    @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId",
+                    new { workspace.WorkspaceId } ))
+                    .Should().Be( parentWorkspace.WorkspaceId );
+            }
         }
 
         static string GetNewGuid( int length = 32 ) => Guid.NewGuid().ToString().Substring( 0, length );
