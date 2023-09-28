@@ -2,24 +2,34 @@
 create transformer on CK.sZoneMove
 as
 begin
+    inject "
+        -- If the new parent Workspace is greater that 0, check if the Workspace have a page and the new parent Workspace have a page too.
+        if @NewParentZoneId > 0 and
+           (select PageId from CK.tWorkspace where WorkspaceId = @ZoneId) > 0 and
+           (select PageId from CK.tWorkspace where WorkspaceId = @NewParentZoneId) = 0
+        begin
+            ;throw 50000, 'HWorkspace.Page.CannotMoveWorkspacePageInWithoutPage', 1;
+        end
+    " into "PreWorkspaceMove";
 
     inject "
     if @IsWorkspaceMove = 1
     begin
         declare @PageId int = (select PageId from CK.tWorkspace where WorkspaceId = @ZoneId);
+        if @PageId > 0
+        begin
+            declare @NewPagePath nvarchar(128) =
+                -- Select the parent page path or 'P' if the @NewParentZoneId is 0.
+                (select iif(len(ResPath) > 0, ResPath, 'P') from CK.vWorkspace where WorkspaceId = @NewParentZoneId)
+                -- Add the path separator.
+                + '/' +
+                -- Obtain the page name : The path item after the last separator.
+                (select right(ResPath, charindex('/', reverse(ResPath)) - 1)
+                    from CK.vWorkspace
+                    where WorkspaceId = @ZoneId);
 
-        declare @NewResPath varchar(128) = 
-            -- ResPath of the web page of the new parent workspace
-            (select rp.ResPath
-                from CK.tWorkspace w
-                inner join CK.tResPath rp on w.PageId = rp.ResId
-                where w.WorkspaceId = @NewParentZoneId)
-            -- ResPath separator
-            + '/' +
-            -- Page name without all the path
-            (select right(ResPath, charindex('/', reverse(ResPath)) - 1) from CK.tResPath where ResId = @PageId);
-
-        exec CK.sResPathRename @PageId, @NewResPath, 1;
+            exec CK.sResPathRename @PageId, @NewPagePath, 1;
+        end
     end
     " into "PostZoneMove";
 end
