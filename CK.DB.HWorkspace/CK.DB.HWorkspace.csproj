@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <IsPackable>true</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="CK.DB.HZone" Version="20.0.0" />
     <PackageReference Include="CK.DB.Workspace" Version="7.0.0" />
@@ -17,5 +14,4 @@
     <None Remove="Res\**\*.sql" />
     <None Remove="Res\**\*.tql" />
   </ItemGroup>
-
 </Project>
