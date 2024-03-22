@@ -10,8 +10,5 @@ namespace CK.DB.HWorkspace
         void StObjConstruct( CK.DB.Workspace.Package workspace, CK.DB.HZone.Package hZone )
         {
         }
-
-        [InjectObject]
-        public WorkspaceTable WorkspaceTable { get; set; }
     }
 }

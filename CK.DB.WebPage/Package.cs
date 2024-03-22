@@ -9,8 +9,5 @@ namespace CK.DB.WebPage
         void StObjConstruct()
         {
         }
-        
-        [InjectObject]
-        public WebPageTable WebPageTable { get; private set; }
     }
 }

@@ -1,3 +1,4 @@
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
@@ -11,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		RepositoryInfo.xml = RepositoryInfo.xml
 		Common\SharedKey.snk = Common\SharedKey.snk
+		appveyor.yml = appveyor.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5E754B9E-84B8-426A-95B0-858D3EDCC19B}"
@@ -18,23 +20,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5E754B9E
 		Tests\TestHelper.config = Tests\TestHelper.config
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeCakeBuilder", "CodeCakeBuilder/CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.Workspace.Page.Tests", "Tests\CK.DB.Workspace.Page.Tests\CK.DB.Workspace.Page.Tests.csproj", "{0889FFE1-585C-4593-8850-BBDB0DCC9AE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.Workspace.Page.Tests", "Tests/CK.DB.Workspace.Page.Tests/CK.DB.Workspace.Page.Tests.csproj", "{0889FFE1-585C-4593-8850-BBDB0DCC9AE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.Workspace.Page", "CK.DB.Workspace.Page\CK.DB.Workspace.Page.csproj", "{A2141FE3-5F9D-4626-BC63-BAD7AB19B41F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.Workspace.Page", "CK.DB.Workspace.Page/CK.DB.Workspace.Page.csproj", "{A2141FE3-5F9D-4626-BC63-BAD7AB19B41F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.WebPage", "CK.DB.WebPage\CK.DB.WebPage.csproj", "{699B7D65-6310-455E-A7D7-8BB8BE3EC595}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.WebPage", "CK.DB.WebPage/CK.DB.WebPage.csproj", "{699B7D65-6310-455E-A7D7-8BB8BE3EC595}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.WebPage.Tests", "Tests\CK.DB.WebPage.Tests\CK.DB.WebPage.Tests.csproj", "{C9989F4D-F172-43ED-B106-3025028E1D7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.WebPage.Tests", "Tests/CK.DB.WebPage.Tests/CK.DB.WebPage.Tests.csproj", "{C9989F4D-F172-43ED-B106-3025028E1D7C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.HWorkspace", "CK.DB.HWorkspace\CK.DB.HWorkspace.csproj", "{505D21BA-DBE2-4EC8-B5B7-AA2BA69443E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.HWorkspace", "CK.DB.HWorkspace/CK.DB.HWorkspace.csproj", "{505D21BA-DBE2-4EC8-B5B7-AA2BA69443E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.HWorkspace.Tests", "Tests\CK.DB.HWorkspace.Tests\CK.DB.HWorkspace.Tests.csproj", "{4ED26968-1059-4EBE-89FF-A98BA76F4596}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.HWorkspace.Tests", "Tests/CK.DB.HWorkspace.Tests/CK.DB.HWorkspace.Tests.csproj", "{4ED26968-1059-4EBE-89FF-A98BA76F4596}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.HWorkspace.Page", "CK.DB.HWorkspace.Page\CK.DB.HWorkspace.Page.csproj", "{D86E3131-2CA8-4A96-BB78-BF481B8CECD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.DB.HWorkspace.Page", "CK.DB.HWorkspace.Page/CK.DB.HWorkspace.Page.csproj", "{D86E3131-2CA8-4A96-BB78-BF481B8CECD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CK.DB.HWorkspace.Page.Tests", "Tests\CK.DB.HWorkspace.Page.Tests\CK.DB.HWorkspace.Page.Tests.csproj", "{6A20CF8D-2DA7-4518-AA35-BEEA6221E978}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CK.DB.HWorkspace.Page.Tests", "Tests/CK.DB.HWorkspace.Page.Tests/CK.DB.HWorkspace.Page.Tests.csproj", "{6A20CF8D-2DA7-4518-AA35-BEEA6221E978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
