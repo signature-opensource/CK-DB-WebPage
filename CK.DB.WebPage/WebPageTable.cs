@@ -26,7 +26,7 @@ namespace CK.DB.WebPage
         /// <param name="aclId">The Acl of the page</param>
         /// <returns>The identifier of the page.</returns>
         [SqlProcedure( "sWebPageCreate" )]
-        public abstract Task<int> CreateWebPageAsync( ISqlCallContext ctx, int actorId, int parentPageId, string pageName, int aclId = 0 );
+        public abstract Task<int> CreateWebPageAsync( ISqlCallContext ctx, int actorId, int parentPageId, string pageName, string pageTitle, int aclId = 0 );
 
         /// <summary>
         /// Destroy the WebPage.

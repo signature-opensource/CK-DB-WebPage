@@ -32,7 +32,7 @@ begin
     
         --<PrePlug revert>
     
-        exec CK.sWebPageCreate @ActorId, 0, @WorkspaceName, @WorkspaceAlcId, @PageId output;
+        exec CK.sWebPageCreate @ActorId, 0, @WorkspaceName, @WorkspaceName, @WorkspaceAlcId, @PageId output;
     
         update CK.tWorkspace
             set PageId = @PageId
