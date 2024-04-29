@@ -25,7 +25,7 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 await webPageTable
-                    .Invoking( async table => await table.CreateWebPageAsync( ctx, actorId, 0, GetNewGuid() ) )
+                    .Invoking( async table => await table.CreateWebPageAsync( ctx, actorId, 0, GetNewGuid(), GetNewGuid() ) )
                     .Should().ThrowAsync<Exception>();
             }
         }
@@ -40,7 +40,7 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 await webPageTable
-                    .Invoking( async table => await table.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() ) )
+                    .Invoking( async table => await table.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid(), GetNewGuid() ) )
                     .Should().ThrowAsync<Exception>();
             }
         }
@@ -61,7 +61,7 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 await webPageTable
-                    .Invoking( async table => await table.CreateWebPageAsync( ctx, 1, 0, pageName ) )
+                    .Invoking( async table => await table.CreateWebPageAsync( ctx, 1, 0, pageName, pageName ) )
                     .Should().ThrowAsync<Exception>();
             }
         }
@@ -78,7 +78,7 @@ namespace CK.DB.WebPage.Tests
             {
                 int actorId = await userTable.CreateUserAsync( ctx, 1, GetNewGuid() );
 
-                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
                 int aclId = await ctx.GetConnectionController( webPageTable ).QuerySingleOrDefaultAsync<int>(
                     @"select AclId from CK.tWebPage where PageId = @PageId;",
@@ -87,7 +87,7 @@ namespace CK.DB.WebPage.Tests
                 await aclTable.AclGrantSetAsync( ctx, 1, aclId, actorId, "Viewer", 16 );
 
                 await webPageTable
-                    .Invoking( async table => await table.CreateWebPageAsync( ctx, actorId, parentPageId, GetNewGuid() ) )
+                    .Invoking( async table => await table.CreateWebPageAsync( ctx, actorId, parentPageId, GetNewGuid(), GetNewGuid() ) )
                     .Should().ThrowAsync<Exception>();
             }
         }
@@ -101,7 +101,7 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 string pageName = GetNewGuid();
-                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName );
+                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName, pageName );
 
                 var webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
 
@@ -127,7 +127,7 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 string pageName = GetNewGuid();
-                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName );
+                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName, pageName );
 
                 var webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
 
@@ -146,10 +146,10 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 string parentPageName = GetNewGuid();
-                int parentPageId = await webPageTable.CreateWebPageAsync(ctx, 1, 0, parentPageName);
+                int parentPageId = await webPageTable.CreateWebPageAsync(ctx, 1, 0, parentPageName, parentPageName );
 
                 string pageName = GetNewGuid();
-                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, pageName );
+                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, pageName, pageName );
 
                 var parentWebPage = await webPageTable.GetWebPageByIdAsync( ctx, parentPageId );
                 parentWebPage.Should().NotBeNull();
@@ -166,14 +166,14 @@ namespace CK.DB.WebPage.Tests
         }
 
         [Test]
-        public async Task destroy_WebPage_destroy_ResPath_Async()
+        public async Task destroy_WebPage_destroy_Res_Async()
         {
             using var services = TestHelper.CreateAutomaticServices();
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
-                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
                 var webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
 
@@ -193,7 +193,7 @@ namespace CK.DB.WebPage.Tests
                 webPage.Should().BeNull();
 
                 resId = await ctx.GetConnectionController( webPageTable ).QuerySingleOrDefaultAsync<int?>(
-                    "select ResId from CK.tResPath where ResId = @ResId",
+                    "select ResId from CK.tRes where ResId = @ResId",
                     new { ResId = pageId } );
 
                 resId.Should().BeNull();
@@ -208,17 +208,17 @@ namespace CK.DB.WebPage.Tests
 
             using( SqlStandardCallContext ctx = new() )
             {
-                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
                 List<int> children = new()
                 {
-                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() ),
-                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() )
+                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid(), GetNewGuid() ),
+                    await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid(), GetNewGuid() )
                 };
-                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid() ) );
-                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid() ) );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid(), GetNewGuid() ) );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid(), GetNewGuid() ) );
 
-                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
                 // Assert pages exists
                 (await webPageTable.GetWebPageByIdAsync( ctx, parentPageId )).Should().NotBeNull();
@@ -249,9 +249,9 @@ namespace CK.DB.WebPage.Tests
 
             using( SqlStandardCallContext ctx = new() )
             {
-                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+                int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
-                await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid() );
+                await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid(), GetNewGuid() );
 
                 await webPageTable.Invoking( table => table.DestroyWebPageAsync( ctx, 1, parentPageId, withChildren: false ) )
                                   .Should().ThrowAsync<Exception>();
@@ -267,13 +267,15 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 string pageName = GetNewGuid();
-                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName );
+                string pageTitle = GetNewGuid();
+                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName, pageTitle );
 
                 var page = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
 
                 page.Should().NotBeNull();
                 page!.PageId.Should().Be( pageId );
                 page!.ResPath.Should().EndWith( '/' + pageName );
+                page!.PageTitle.Should().Be( pageTitle );
                 page!.ParentPageId.Should().Be( 0 );
 
                 var res = await ctx.GetConnectionController( webPageTable ).QuerySingleOrDefaultAsync<(int ResId, string ResPath)>(
@@ -285,13 +287,15 @@ namespace CK.DB.WebPage.Tests
                 res.ResPath.Should().Be( $"P/{pageName}" );
 
                 string childPageName = GetNewGuid();
-                int childPageId = await webPageTable.CreateWebPageAsync( ctx, 1, pageId, childPageName );
+                string childPageTitle = GetNewGuid();
+                int childPageId = await webPageTable.CreateWebPageAsync( ctx, 1, pageId, childPageName, childPageTitle );
 
                 var childPage = await webPageTable.GetWebPageByIdAsync( ctx, childPageId );
 
                 childPage.Should().NotBeNull();
                 childPage!.ParentPageId!.Should().Be( pageId );
                 childPage!.ResPath.Should().EndWith( '/' + childPageName );
+                childPage!.PageTitle!.Should().Be( childPageTitle );
                 childPage!.ParentPageId.Should().Be( pageId );
                 childPage!.AclId.Should().Be( page.AclId );
 
@@ -324,12 +328,12 @@ namespace CK.DB.WebPage.Tests
             using( SqlStandardCallContext ctx = new() )
             {
                 string parentPageName = GetNewGuid();
-                var parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, parentPageName );
+                var parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, parentPageName, parentPageName );
 
                 (await GetPagePathNameAsync( ctx, parentPageId )).Should().NotBeNull().And.Be( $"P/{parentPageName}" );
 
                 string childPageName = GetNewGuid();
-                var childPageId = await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, childPageName );
+                var childPageId = await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, childPageName, childPageName );
 
                 (await GetPagePathNameAsync( ctx, childPageId )).Should().NotBeNull().And.Be( $"P/{parentPageName}/{childPageName}" );
 

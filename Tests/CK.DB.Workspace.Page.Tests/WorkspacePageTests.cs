@@ -73,12 +73,12 @@ namespace CK.DB.Workspace.Page.Tests
                 var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
                 List<int> children = new()
                 {
-                    await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid() ),
-                    await webPageTable.CreateWebPageAsync( ctx, 1, webPage.PageId, GetNewGuid() ),
+                    await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid(), GetNewGuid() ),
+                    await webPageTable.CreateWebPageAsync( ctx, 1, webPage.PageId, GetNewGuid(), GetNewGuid() ),
                 };
-                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid() ) );
-                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid() ) );
-                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid() );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid(), GetNewGuid() ) );
+                children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid(), GetNewGuid() ) );
+                int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
                 // Check if children exists
                 foreach( int childId in children )
@@ -162,7 +162,7 @@ namespace CK.DB.Workspace.Page.Tests
                 await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
                 var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-                await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid() );
+                await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid(), GetNewGuid() );
 
                 await workspacePagePkg.Invoking( table => table.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId, forceUnplug: false ) )
                                    .Should().ThrowAsync<Exception>();
@@ -245,10 +245,10 @@ namespace CK.DB.Workspace.Page.Tests
                     (await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId ))!.PageId
                 };
 
-                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[0], GetNewGuid() ) );
-                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[0], GetNewGuid() ) );
-                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[2], GetNewGuid() ) );
-                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[3], GetNewGuid() ) );
+                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[0], GetNewGuid(), GetNewGuid() ) );
+                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[0], GetNewGuid(), GetNewGuid() ) );
+                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[2], GetNewGuid(), GetNewGuid() ) );
+                webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[3], GetNewGuid(), GetNewGuid() ) );
 
                 var sitemap = await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 );
                 sitemap.Should().HaveCount( webPageIds.Count );

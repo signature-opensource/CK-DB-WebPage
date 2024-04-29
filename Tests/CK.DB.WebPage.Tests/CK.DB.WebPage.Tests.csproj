@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="CK.DB.Acl.Tests" Version="20.0.0" />
     <PackageReference Include="CK.DB.Res.ResPath.Tests" Version="3.0.0" />
+    <PackageReference Include="CK.DB.Res.ResString.Tests" Version="20.0.0" />
     <PackageReference Include="CK.SqlServer.Dapper" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />

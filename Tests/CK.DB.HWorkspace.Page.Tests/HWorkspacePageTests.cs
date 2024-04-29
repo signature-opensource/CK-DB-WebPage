@@ -110,10 +110,10 @@ namespace CK.DB.HWorkspace.Page.Tests
                 await zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentWorkspace.WorkspaceId );
 
                 var childPage1Name = GetNewGuid( 20 );
-                int child1PageId = await webPageTable.CreateWebPageAsync( ctx, 1, workspacePage!.PageId, childPage1Name );
+                int child1PageId = await webPageTable.CreateWebPageAsync( ctx, 1, workspacePage!.PageId, childPage1Name, childPage1Name );
 
                 var childPage2Name = GetNewGuid( 20 );
-                int childPage2Id = await webPageTable.CreateWebPageAsync( ctx, 1, child1PageId, childPage2Name );
+                int childPage2Id = await webPageTable.CreateWebPageAsync( ctx, 1, child1PageId, childPage2Name, childPage1Name );
 
                 (await webPageTable.GetWebPageByIdAsync( ctx, workspacePage.PageId ))
                     .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{parentWorkspaceName}/{workspaceName}" }, o => o.Including( i => i.ResPath ) );

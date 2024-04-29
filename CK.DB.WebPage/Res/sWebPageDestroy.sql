@@ -48,7 +48,8 @@ begin
 	--<PreDestroy revert />
 
     delete from CK.tWebPage where PageId = @PageId;
-    exec CK.sResPathDestroy @PageId;
+    exec CK.sResDestroy @PageId;
+
     -- Should remove Acl?
 	
 	--<PostDestroy />	

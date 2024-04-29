@@ -4,6 +4,7 @@ create procedure CK.sWebPageCreate
     @ActorId int,
     @ParentPageId int,
     @PageName varchar(32),
+    @PageTitle nvarchar(400),
     @AclId int = 0,
     @PageId int output
 )
@@ -52,6 +53,7 @@ begin
 	--<PreCreate revert />
 
     exec CK.sResCreateWithResPath @PagePath, @PageId output;
+    exec CK.sResStringSet @PageId, @PageTitle;
 
     insert into CK.tWebPage ( PageId, AclId ) values( @PageId, @AclId );
 	
