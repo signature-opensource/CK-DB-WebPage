@@ -12,7 +12,7 @@ as
 begin
     if (@ActorId is null or @ActorId <= 0) throw 50000, 'WebPage.InvalidActorId', 1;
     if (@ParentPageId is null or @ParentPageId < 0 ) throw 50000, 'WebPage.InvalidParentId', 1;
-    if (len(@PageName) = 0 or patindex('%[^0-9a-zA-Z-._,;]%', @PageName) > 0) throw 50000, 'WebPage.InvalidName', 1;
+    if (len(@PageName) = 0 or patindex('%[^0-9a-zA-Z-._,;$]%', @PageName) > 0) throw 50000, 'WebPage.InvalidName', 1;
 
 	--[beginsp]
 

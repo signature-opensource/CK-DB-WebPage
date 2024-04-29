@@ -48,7 +48,6 @@ namespace CK.DB.WebPage.Tests
         [TestCase( "" )]
         [TestCase( "te/st" )]
         [TestCase( "te st" )]
-        [TestCase( "te$st" )]
         [TestCase( "te:st" )]
         [TestCase( "te#st" )]
         [TestCase( "te&st" )]
@@ -115,6 +114,25 @@ namespace CK.DB.WebPage.Tests
                     new { ResId = pageId } );
 
                 resId.Should().NotBeNull();
+            }
+        }
+
+        [Test]
+        public async Task create_WebPage_with_dollar_Async()
+        {
+            using var services = TestHelper.CreateAutomaticServices();
+            var webPageTable = services.GetRequiredService<WebPageTable>();
+
+            using( SqlStandardCallContext ctx = new() )
+            {
+                string pageName = $"${GetNewGuid( 31 )}";
+                int pageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, pageName, pageName );
+
+                var webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
+
+                webPage.Should().NotBeNull();
+                webPage!.PageId.Should().Be( pageId );
+                webPage!.ResPath.Should().EndWith( '/' + pageName );
             }
         }
 
@@ -349,6 +367,6 @@ namespace CK.DB.WebPage.Tests
         /// <summary>
         /// Generate a new guid truncated at 32 characters.
         /// </summary>
-        static string GetNewGuid() => Guid.NewGuid().ToString().Substring( 0, 32 );
+        static string GetNewGuid( int length = 32 ) => Guid.NewGuid().ToString().Substring( 0, length );
     }
 }
