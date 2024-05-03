@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -8,11 +7,10 @@
   <ItemGroup>
     <PackageReference Include="CK.DB.HZone.Tests" Version="20.0.0" />
     <PackageReference Include="CK.SqlServer.Dapper" Version="7.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CK.DB.HWorkspace\CK.DB.HWorkspace.csproj" />
   </ItemGroup>
-
 </Project>
