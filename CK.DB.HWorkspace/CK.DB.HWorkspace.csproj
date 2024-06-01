@@ -4,8 +4,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.HZone" Version="20.0.1--0039-develop" />
-    <PackageReference Include="CK.DB.Workspace" Version="7.0.3--0024-develop" />
+    <PackageReference Include="CK.DB.HZone" Version="20.0.1--0040-develop" />
+    <PackageReference Include="CK.DB.Workspace" Version="7.0.3--0025-develop" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="**\*.sql;**\*.tql;**\*.y4" Exclude="bin\**;obj\**;CodeCakeBuilder\**;packages\**;@(EmbeddedResource)" />
