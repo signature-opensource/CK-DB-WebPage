@@ -6,10 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.Acl.Tests" Version="20.0.1--0053-develop" />
-    <PackageReference Include="CK.DB.Res.ResPath.Tests" Version="3.0.1--0051-develop" />
-    <PackageReference Include="CK.DB.Res.ResString.Tests" Version="20.0.1--0053-develop" />
-    <PackageReference Include="CK.SqlServer.Dapper" Version="7.0.1--0043-develop" />
+    <PackageReference Include="CK.DB.Acl.Tests" Version="20.0.1--0054-develop" />
+    <PackageReference Include="CK.DB.Res.ResPath.Tests" Version="3.0.1--0052-develop" />
+    <PackageReference Include="CK.DB.Res.ResString.Tests" Version="20.0.1--0054-develop" />
+    <PackageReference Include="CK.SqlServer.Dapper" Version="7.0.1--0044-develop" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
