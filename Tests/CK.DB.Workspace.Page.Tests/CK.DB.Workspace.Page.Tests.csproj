@@ -3,7 +3,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <Description>This package contains tests for CK.DB.Workspace.Page (uses CK.DB.Tests.NUnit).</Description>
     <IsPackable>True</IsPackable>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CK.DB.Workspace.Page\CK.DB.Workspace.Page.csproj" />

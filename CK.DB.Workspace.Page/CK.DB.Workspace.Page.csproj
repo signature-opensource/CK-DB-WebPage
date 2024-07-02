@@ -3,7 +3,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <Description>This package implements Workspace.Page.</Description>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CK.DB.Workspace" Version="7.0.3--0045-develop" />
