@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.HZone.Tests" Version="20.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="CK.DB.HZone.Tests" Version="21.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
@@ -15,5 +13,4 @@
     <ProjectReference Include="..\CK.DB.HWorkspace.Tests\CK.DB.HWorkspace.Tests.csproj" />
     <ProjectReference Include="..\CK.DB.Workspace.Page.Tests\CK.DB.Workspace.Page.Tests.csproj" />
   </ItemGroup>
-
 </Project>

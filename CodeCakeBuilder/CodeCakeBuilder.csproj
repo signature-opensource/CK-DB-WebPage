@@ -6,7 +6,6 @@
     <SignAssembly>false</SignAssembly>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-    <Nullable>annotations</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CK.Core" Version="19.0.0" />
@@ -18,7 +17,7 @@
     <None Remove="TestResult.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SimpleGitVersion.Cake" Version="9.0.1--0000-develop" />
+    <PackageReference Include="SimpleGitVersion.Cake" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Releases\" />
