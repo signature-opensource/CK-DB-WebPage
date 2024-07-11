@@ -3,9 +3,9 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.Acl" Version="0.0.0--04yz2j6-develop" />
-    <PackageReference Include="CK.DB.Res.ResPath" Version="0.0.0--04yz2j8-develop" />
-    <PackageReference Include="CK.DB.Res.ResString" Version="0.0.0--04yz2j6-develop" />
+    <PackageReference Include="CK.DB.Acl" Version="0.0.0--04yz3nl-develop" />
+    <PackageReference Include="CK.DB.Res.ResPath" Version="0.0.0--04yz3nn-develop" />
+    <PackageReference Include="CK.DB.Res.ResString" Version="0.0.0--04yz3nl-develop" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="**\*.sql;**\*.tql;**\*.y4" Exclude="bin\**;obj\**;CodeCakeBuilder\**;packages\**;@(EmbeddedResource)" />
