@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CK.DB.Acl" Version="0.0.0--04yzfbn-develop" />
-    <PackageReference Include="CK.DB.Res.ResPath" Version="0.0.0--04yzfbr-develop" />
+    <PackageReference Include="CK.DB.Res.ResPath" Version="0.0.0--04yzm9m-develop" />
     <PackageReference Include="CK.DB.Res.ResString" Version="0.0.0--04yzfbn-develop" />
   </ItemGroup>
   <ItemGroup>
