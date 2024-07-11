@@ -1,7 +1,7 @@
 using CK.DB.WebPage.Tests;
 using CK.DB.Workspace.Page.Tests;
 using CK.SqlServer;
-using static CK.Testing.DBSetupTestHelper;
+using static CK.Testing.MonitorTestHelper;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;

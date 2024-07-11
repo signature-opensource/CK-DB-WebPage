@@ -2,7 +2,7 @@ using CK.DB.Acl;
 using CK.DB.Actor;
 using CK.DB.HZone;
 using CK.SqlServer;
-using static CK.Testing.DBSetupTestHelper;
+using static CK.Testing.MonitorTestHelper;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
