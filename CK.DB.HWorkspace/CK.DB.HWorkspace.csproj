@@ -3,8 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.HZone" Version="0.0.0--04z94ff-develop" />
-    <PackageReference Include="CK.DB.Workspace" Version="0.0.0--04z94fh-develop" />
+    <PackageReference Include="CK.DB.HZone" Version="0.0.0--04zb0m6-develop" />
+    <PackageReference Include="CK.DB.Workspace" Version="0.0.0--04zb0m9-develop" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="**\*.sql;**\*.tql;**\*.y4" Exclude="bin\**;obj\**;CodeCakeBuilder\**;packages\**;@(EmbeddedResource)" />
