@@ -3,7 +3,7 @@ using CK.DB.Actor;
 using CK.DB.WebPage;
 using CK.DB.WebPage.Tests;
 using CK.SqlServer;
-using static CK.Testing.MonitorTestHelper;
+using CK.Testing;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static CK.Testing.MonitorTestHelper;
 
 namespace CK.DB.Workspace.Page.Tests
 {
@@ -20,7 +21,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task create_workspace_creates_webPage_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
 
@@ -39,7 +40,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task workspace_page_have_same_alc_that_workspace_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
 
@@ -59,7 +60,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_page_with_force_unplug_destroy_all_webPages_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var webPageTable = services.GetRequiredService<WebPageTable>();
@@ -71,11 +72,11 @@ namespace CK.DB.Workspace.Page.Tests
 
                 // Create children webPage
                 var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-                List<int> children = new()
-                {
+                List<int> children =
+                [
                     await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid(), GetNewGuid() ),
                     await webPageTable.CreateWebPageAsync( ctx, 1, webPage.PageId, GetNewGuid(), GetNewGuid() ),
-                };
+                ];
                 children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid(), GetNewGuid() ) );
                 children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid(), GetNewGuid() ) );
                 int otherPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
@@ -107,7 +108,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_page_without_children_WebPage_and_force_unplug_0_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
 
@@ -133,7 +134,7 @@ namespace CK.DB.Workspace.Page.Tests
         [TestCase( "te*st" )]
         public async Task workspace_with_invalid_webPage_name_cannot_be_used_as_workspacePage_Async( string workspaceName )
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
 
@@ -150,7 +151,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_with_children_page_thow_an_error_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var webPageTable = services.GetRequiredService<WebPageTable>();
@@ -171,7 +172,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task invalid_user_cannot_obtain_workspace_siteMap_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var userTable = services.GetRequiredService<UserTable>();
@@ -206,7 +207,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task workspace_viewer_can_obtain_siteMap_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var userTable = services.GetRequiredService<UserTable>();
@@ -228,7 +229,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task get_workspace_webPage_and_children_pages_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var webPageTable = services.GetRequiredService<WebPageTable>();
@@ -239,10 +240,10 @@ namespace CK.DB.Workspace.Page.Tests
                 var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
                 await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
-                List<int> webPageIds = new()
-                {
+                List<int> webPageIds =
+                [
                     (await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId ))!.PageId
-                };
+                ];
 
                 webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[0], GetNewGuid(), GetNewGuid() ) );
                 webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[0], GetNewGuid(), GetNewGuid() ) );
@@ -262,7 +263,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task rename_workspacePage_update_workspace_webPage_ResName_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var groupNamePkg = services.GetRequiredService<Group.SimpleNaming.Package>();
@@ -296,7 +297,7 @@ namespace CK.DB.Workspace.Page.Tests
         [TestCase( "te*st" )]
         public async Task rename_workspacePage_with_invalid_name_throw_an_error_Async( string newWorkspaceName )
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<Package>();
             var groupNamePkg = services.GetRequiredService<Group.SimpleNaming.Package>();
@@ -314,7 +315,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task plug_workspace_page_is_idempotent_Async()
         {
-            using var service = TestHelper.CreateAutomaticServices();
+            var service = SharedEngine.AutomaticServices;
             var workspaceTable = service.GetRequiredService<WorkspaceTable>();
             var workspacePagePackage = service.GetRequiredService<Package>();
 
@@ -347,7 +348,7 @@ namespace CK.DB.Workspace.Page.Tests
         [Test]
         public async Task unplug_workspace_page_is_idempotent_Async()
         {
-            using var service = TestHelper.CreateAutomaticServices();
+            var service = SharedEngine.AutomaticServices;
             var workspaceTable = service.GetRequiredService<WorkspaceTable>();
             var workspacePagePkg = service.GetRequiredService<Package>();
 

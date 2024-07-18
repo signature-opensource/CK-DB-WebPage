@@ -1,13 +1,14 @@
 using CK.DB.WebPage.Tests;
 using CK.DB.Workspace.Page.Tests;
 using CK.SqlServer;
-using static CK.Testing.MonitorTestHelper;
+using CK.Testing;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using static CK.Testing.MonitorTestHelper;
 
 namespace CK.DB.HWorkspace.Page.Tests
 {
@@ -17,11 +18,9 @@ namespace CK.DB.HWorkspace.Page.Tests
         [Test]
         public async Task sub_workspace_has_parent_workspace_page_name_as_prefix_of_his_page_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
             var workspacePagePackage = services.GetRequiredService<CK.DB.Workspace.Page.Package>();
-            var hWorkspacePackage = services.GetRequiredService<CK.DB.HWorkspace.Page.Package>();
-            var webPageTabe = services.GetRequiredService<CK.DB.WebPage.WebPageTable>();
 
             using( SqlStandardCallContext ctx = new( TestHelper.Monitor ) )
             {
@@ -50,7 +49,7 @@ namespace CK.DB.HWorkspace.Page.Tests
         [Test]
         public async Task move_sub_workspace_rename_his_ResPath_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
             var workspacePagePackage = services.GetRequiredService<CK.DB.Workspace.Page.Package>();
             var webPageTable = services.GetRequiredService<CK.DB.WebPage.WebPageTable>();
@@ -89,7 +88,7 @@ namespace CK.DB.HWorkspace.Page.Tests
         [Test]
         public async Task move_sub_workspace_rename_his_children_page_ResPath_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
             var workspacePagePackage = services.GetRequiredService<CK.DB.Workspace.Page.Package>();
             var webPageTable = services.GetRequiredService<CK.DB.WebPage.WebPageTable>();
@@ -142,7 +141,7 @@ namespace CK.DB.HWorkspace.Page.Tests
         [Test]
         public async Task move_sub_workspace_out_of_parent_workspace_rename_his_page_name_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<CK.DB.Workspace.Page.Package>();
             var webPageTable = services.GetRequiredService<CK.DB.WebPage.WebPageTable>();
@@ -173,7 +172,7 @@ namespace CK.DB.HWorkspace.Page.Tests
         [Test]
         public async Task set_page_to_child_workspace_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
             var workspacePagePkg = services.GetRequiredService<CK.DB.Workspace.Page.Package>();
             var webPageTable = services.GetRequiredService<CK.DB.WebPage.WebPageTable>();
@@ -201,7 +200,7 @@ namespace CK.DB.HWorkspace.Page.Tests
         [Test]
         public async Task cannot_move_workspace_page_as_child_of_workspace_without_page_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
             var workspacePageTable = services.GetRequiredService<CK.DB.Workspace.Page.Package>();
             var zoneTable = services.GetRequiredService<CK.DB.HZone.ZoneTable>();

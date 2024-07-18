@@ -1,7 +1,7 @@
 using CK.DB.Acl;
 using CK.DB.Actor;
 using CK.SqlServer;
-using static CK.Testing.MonitorTestHelper;
+using CK.Testing;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ namespace CK.DB.WebPage.Tests
         [TestCase( 0 )]
         public async Task invaid_actor_cannot_create_page_Async( int actorId )
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -34,7 +34,7 @@ namespace CK.DB.WebPage.Tests
         [TestCase( int.MaxValue )]
         public async Task invaid_parent_page_throw_an_error_Async( int parentPageId )
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -54,7 +54,7 @@ namespace CK.DB.WebPage.Tests
         [TestCase( "te=st" )]
         public async Task invalid_page_name_thow_an_error_Async( string pageName )
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -68,7 +68,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task not_Contributor_on_parent_page_acl_cannot_create_page_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var userTable = services.GetRequiredService<UserTable>();
             var webPageTable = services.GetRequiredService<WebPageTable>();
             var aclTable = services.GetRequiredService<AclTable>();
@@ -94,7 +94,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_creates_ResPath_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -120,7 +120,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_with_dollar_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -139,7 +139,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_without_parent_and_acl_creates_new_acl_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -158,7 +158,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task create_WebPage_with_parent_set_parent_aclId_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -186,7 +186,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task destroy_WebPage_destroy_Res_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -221,18 +221,18 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task destroy_webPage_with_children_to_1_destroy_all_children_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
             {
                 int parentPageId = await webPageTable.CreateWebPageAsync( ctx, 1, 0, GetNewGuid(), GetNewGuid() );
 
-                List<int> children = new()
-                {
+                List<int> children =
+                [
                     await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid(), GetNewGuid() ),
                     await webPageTable.CreateWebPageAsync( ctx, 1, parentPageId, GetNewGuid(), GetNewGuid() )
-                };
+                ];
                 children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[0], GetNewGuid(), GetNewGuid() ) );
                 children.Add( await webPageTable.CreateWebPageAsync( ctx, 1, children[2], GetNewGuid(), GetNewGuid() ) );
 
@@ -262,7 +262,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task destroy_WebPage_with_with_children_and_force_destroy_to_0_throw_an_error_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -279,7 +279,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task view_right_informations_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -330,7 +330,7 @@ namespace CK.DB.WebPage.Tests
         [Test]
         public async Task rename_WebPage_rename_path_of_children_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var webPageTable = services.GetRequiredService<WebPageTable>();
 
             async Task<string?> GetPagePathNameAsync( ISqlCallContext ctx, int pageId )

@@ -2,13 +2,14 @@ using CK.DB.Acl;
 using CK.DB.Actor;
 using CK.DB.HZone;
 using CK.SqlServer;
-using static CK.Testing.MonitorTestHelper;
+using CK.Testing;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using static CK.Testing.MonitorTestHelper;
 
 namespace CK.DB.HWorkspace.Tests
 {
@@ -18,7 +19,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task create_workspace_with_parent_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -35,7 +36,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task unplug_workspace_without_children_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -53,7 +54,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task unplug_workspace_with_children_throw_an_error_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -69,7 +70,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task not_safe_administrator_of_workspace_cannot_move_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -84,7 +85,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task safe_administrator_of_workspace_can_move_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -100,7 +101,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task not_editor_of_origine_parent_workspace_cannot_move_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -125,7 +126,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task editor_of_origine_parent_workspace_can_move_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -149,7 +150,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task not_editor_of_destination_parent_workspace_cannot_move_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -174,7 +175,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task editor_of_destination_parent_workspace_can_move_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
 
             using( SqlStandardCallContext ctx = new() )
@@ -198,7 +199,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task cannot_move_workspace_in_Zone_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var zoneTable = services.GetRequiredService<ZoneTable>();
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
 
@@ -231,7 +232,7 @@ namespace CK.DB.HWorkspace.Tests
                                                                                                                                byte userDestinationParentGrantLevel,
                                                                                                                                byte userChildGrantLevel )
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var workspaceTable = services.GetRequiredService<WorkspaceTable>();
             var userTable = services.GetRequiredService<UserTable>();
             var aclTable = services.GetRequiredService<AclTable>();
@@ -266,7 +267,7 @@ namespace CK.DB.HWorkspace.Tests
         [Test]
         public async Task simple_workspace_admin_cannot_move_sub_workspace_to_parent_workspace_0_Async()
         {
-            using var services = TestHelper.CreateAutomaticServices();
+            var services = SharedEngine.AutomaticServices;
             var userTable = services.GetRequiredService<CK.DB.Actor.UserTable>();
             var aclTable = services.GetRequiredService<CK.DB.Acl.AclTable>();
             var workspaceTable = services.GetRequiredService<CK.DB.HWorkspace.WorkspaceTable>();
