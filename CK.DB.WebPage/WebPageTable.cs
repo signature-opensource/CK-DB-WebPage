@@ -9,7 +9,7 @@ namespace CK.DB.WebPage
     [SqlObjectItem( "vWebPage" )]
     public abstract class WebPageTable : SqlTable
     {
-        void StObjConstruct( CK.DB.Res.ResPath.Package resPath, CK.DB.Acl.Package acl )
+        void StObjConstruct( CK.DB.Res.ResPath.Package resPath, CK.DB.Acl.Package acl, CK.DB.Res.ResString.Package resString )
         {
         }
 
