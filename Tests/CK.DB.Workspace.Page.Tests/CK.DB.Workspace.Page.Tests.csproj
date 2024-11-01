@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\CK.DB.Workspace.Page\CK.DB.Workspace.Page.csproj" />
     <ProjectReference Include="..\CK.DB.WebPage.Tests\CK.DB.WebPage.Tests.csproj" />
-    <PackageReference Include="CK.DB.Workspace.Tests" Version="9.0.0-a00-00-0015-develop" />
+    <PackageReference Include="CK.DB.Workspace.Tests" Version="9.0.0-a00-00-0016-develop" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
   </ItemGroup>
