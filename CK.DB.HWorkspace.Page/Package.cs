@@ -1,15 +1,14 @@
 using CK.Core;
 
-namespace CK.DB.HWorkspace.Page
+namespace CK.DB.HWorkspace.Page;
+
+[SqlPackage( Schema = "CK", ResourcePath = "Res" )]
+[Versions( "1.0.0" )]
+[SqlObjectItem( "transform:sZoneMove" )]
+[SqlObjectItem( "transform:sWorkspacePagePlug" )]
+public abstract class Package : SqlPackage
 {
-    [SqlPackage( Schema = "CK", ResourcePath = "Res" )]
-    [Versions( "1.0.0" )]
-    [SqlObjectItem( "transform:sZoneMove" )]
-    [SqlObjectItem( "transform:sWorkspacePagePlug" )]
-    public abstract class Package : SqlPackage
+    void StObjConstruct( CK.DB.Workspace.Page.Package workspacePage, CK.DB.HWorkspace.Package hworkspace )
     {
-        void StObjConstruct( CK.DB.Workspace.Page.Package workspacePage, CK.DB.HWorkspace.Package hworkspace )
-        {
-        }
     }
 }

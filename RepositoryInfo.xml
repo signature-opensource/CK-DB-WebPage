@@ -1,5 +1,5 @@
-﻿<RepositoryInfo>
-  <SimpleGitVersion>
+<RepositoryInfo>
+  <SimpleGitVersion StartingVersion="0.4.0-alpha">
     <Branches>
       <Branch Name="develop" CIVersionMode="LastReleaseBased" VersionName="develop" />
     </Branches>
