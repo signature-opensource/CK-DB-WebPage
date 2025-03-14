@@ -5,13 +5,15 @@ using CK.DB.WebPage.Tests;
 using CK.SqlServer;
 using CK.Testing;
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using static CK.Testing.MonitorTestHelper;
+using System.Linq;
+using CK.Core;
 
 namespace CK.DB.Workspace.Page.Tests;
 
@@ -32,8 +34,8 @@ public class WorkspacePageTests
 
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
 
-            webPage.Should().NotBeNull();
-            webPage!.PageId.Should().BeGreaterThan( 0 );
+            webPage.ShouldNotBeNull();
+            webPage!.PageId.ShouldBeGreaterThan( 0 );
         }
     }
 
@@ -53,7 +55,7 @@ public class WorkspacePageTests
                 @"select AclId from CK.tWorkspace where WorkspaceId = @WorkspaceId;",
                 new { workspace.WorkspaceId } );
 
-            (await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId ))!.AclId.Should().Be( workspaceAclId );
+            (await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId ))!.AclId.ShouldBe( workspaceAclId );
         }
     }
 
@@ -84,24 +86,24 @@ public class WorkspacePageTests
             // Check if children exists
             foreach( int childId in children )
             {
-                (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().NotBeNull();
+                (await webPageTable.GetWebPageByIdAsync( ctx, childId )).ShouldNotBeNull();
             }
-            (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
+            (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).ShouldNotBeNull();
 
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 )).Should().HaveCount( 5 );
+            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 )).Count().ShouldBe( 5 );
 
             // Unplug workspace
             await workspacePagePkg.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId, forceUnplug: true );
 
             // Check if children exists
-            (await webPageTable.GetWebPageByIdAsync( ctx, webPage.PageId )).Should().BeNull();
+            (await webPageTable.GetWebPageByIdAsync( ctx, webPage.PageId )).ShouldBeNull();
             foreach( int childId in children )
             {
-                (await webPageTable.GetWebPageByIdAsync( ctx, childId )).Should().BeNull();
+                (await webPageTable.GetWebPageByIdAsync( ctx, childId )).ShouldBeNull();
             }
-            (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).Should().NotBeNull();
+            (await webPageTable.GetWebPageByIdAsync( ctx, otherPageId )).ShouldNotBeNull();
 
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 )).Should().BeEmpty();
+            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 )).ShouldBeEmpty();
         }
     }
 
@@ -118,14 +120,14 @@ public class WorkspacePageTests
             await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-            webPage.Should().NotBeNull();
-            webPage!.PageId.Should().BeGreaterThan( 0 );
+            webPage.ShouldNotBeNull();
+            webPage!.PageId.ShouldBeGreaterThan( 0 );
 
             await workspacePagePkg.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId, forceUnplug: false );
 
             webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-            webPage.Should().NotBeNull();
-            webPage!.PageId.Should().Be( 0 );
+            webPage.ShouldNotBeNull();
+            webPage!.PageId.ShouldBe( 0 );
         }
     }
 
@@ -141,10 +143,10 @@ public class WorkspacePageTests
         using( SqlStandardCallContext ctx = new() )
         {
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, workspaceName );
-            workspace.Name.Should().StartWith( workspaceName );
+            workspace.Name.ShouldStartWith( workspaceName );
 
-            await workspacePagePkg.Invoking( table => table.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId ) )
-                                  .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId ) )
+                                  .ShouldThrowAsync<Exception>();
         }
     }
 
@@ -164,8 +166,8 @@ public class WorkspacePageTests
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
             await webPageTable.CreateWebPageAsync( ctx, 1, webPage!.PageId, GetNewGuid(), GetNewGuid() );
 
-            await workspacePagePkg.Invoking( table => table.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId, forceUnplug: false ) )
-                               .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => workspacePagePkg.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId, forceUnplug: false ) )
+                               .ShouldThrowAsync<Exception>();
         }
     }
 
@@ -184,23 +186,23 @@ public class WorkspacePageTests
             await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-            webPage.Should().NotBeNull();
+            webPage.ShouldNotBeNull();
 
             // Anonimous user
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 0 )).Should().BeEmpty();
+            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 0 )).ShouldBeEmpty();
 
 
             // Not workspace member
             int userId = await userTable.CreateUserAsync( ctx, 1, GetNewGuid() );
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).Should().BeEmpty();
+            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).ShouldBeEmpty();
 
             // Not viewer
             await aclTable.AclGrantSetAsync( ctx, 1, webPage!.AclId, userId, "User", 8 );
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).Should().BeEmpty();
+            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).ShouldBeEmpty();
 
             // Viewer
             await aclTable.AclGrantSetAsync( ctx, 1, webPage!.AclId, userId, "Viewer", 16 );
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).Should().NotBeEmpty().And.HaveCount( 1 );
+            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).ShouldHaveSingleItem();
         }
     }
 
@@ -222,7 +224,7 @@ public class WorkspacePageTests
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
             await aclTalbe.AclGrantSetAsync( ctx, 1, webPage!.AclId, userId, "Viewer", 16 );
 
-            (await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, userId )).Should().NotBeEmpty().And.HaveCount( 1 );
+            (await workspaceTable.GetWorkspaceSiteMapAsync(ctx, workspace.WorkspaceId, userId)).ShouldHaveSingleItem();
         }
     }
 
@@ -251,11 +253,11 @@ public class WorkspacePageTests
             webPageIds.Add( await webPageTable.CreateWebPageAsync( ctx, 1, webPageIds[3], GetNewGuid(), GetNewGuid() ) );
 
             var sitemap = await workspaceTable.GetWorkspaceSiteMapAsync( ctx, workspace.WorkspaceId, 1 );
-            sitemap.Should().HaveCount( webPageIds.Count );
+            sitemap.Count().ShouldBe( webPageIds.Count );
 
             foreach( var webPageId in webPageIds )
             {
-                sitemap.Should().Contain( siteMapitem => siteMapitem.PageId == webPageId );
+                sitemap.ShouldContain( siteMapitem => siteMapitem.PageId == webPageId );
             }
         }
     }
@@ -283,11 +285,11 @@ public class WorkspacePageTests
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
             await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
-            (await GetWebPageResPathAsync( workspace.WorkspaceId )).Should().EndWith( '/' + workspace.Name );
+            (await GetWebPageResPathAsync( workspace.WorkspaceId )).ShouldEndWith( '/' + workspace.Name );
 
             string workspaceName = await groupNamePkg.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, GetNewGuid() );
 
-            (await GetWebPageResPathAsync( workspace.WorkspaceId )).Should().EndWith( '/' + workspaceName );
+            (await GetWebPageResPathAsync( workspace.WorkspaceId )).ShouldEndWith( '/' + workspaceName );
         }
     }
 
@@ -307,8 +309,8 @@ public class WorkspacePageTests
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
             await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
-            await groupNamePkg.Invoking( table => table.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, newWorkspaceName ) )
-                              .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => groupNamePkg.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, newWorkspaceName ) )
+                              .ShouldThrowAsync<Exception>();
         }
     }
 
@@ -324,21 +326,21 @@ public class WorkspacePageTests
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
 
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-            webPage.Should().NotBeNull().And.BeEquivalentTo( new WorkspaceTableExtensions.WebPage { PageId = 0, AclId = 0 } );
+            webPage.ShouldBeEquivalentTo( new WorkspaceTableExtensions.WebPage { PageId = 0, AclId = 0 } );
 
             int previousPageId = 0;
             for( int i = 0; i < 10; i++ )
             {
                 int pageId = await workspacePagePackage.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
-                pageId.Should().BeGreaterThan( 0 );
+                pageId.ShouldBeGreaterThan( 0 );
 
                 webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-                webPage.Should().NotBeNull();
-                webPage!.PageId.Should().Be( pageId );
+                webPage.ShouldNotBeNull();
+                webPage!.PageId.ShouldBe( pageId );
 
                 if( previousPageId > 0 )
                 {
-                    previousPageId.Should().Be( pageId );
+                    previousPageId.ShouldBe( pageId );
                 }
                 previousPageId = pageId;
             }
@@ -358,14 +360,14 @@ public class WorkspacePageTests
             int pageId = await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-            webPage.Should().NotBeNull();
-            webPage!.PageId.Should().Be( pageId );
+            webPage.ShouldNotBeNull();
+            webPage!.PageId.ShouldBe( pageId );
 
             for( int i = 0; i < 10; i++ )
             {
                 await workspacePagePkg.UnplugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
                 webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-                webPage.Should().NotBeNull().And.BeEquivalentTo( new WorkspaceTableExtensions.WebPage { PageId = 0, AclId = 0 } );
+                webPage.ShouldBeEquivalentTo( new WorkspaceTableExtensions.WebPage { PageId = 0, AclId = 0 } );
             }
         }
     }
