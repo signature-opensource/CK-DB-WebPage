@@ -3,12 +3,13 @@ using CK.DB.Workspace.Page.Tests;
 using CK.SqlServer;
 using CK.Testing;
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 using static CK.Testing.MonitorTestHelper;
+using CK.Core;
 
 namespace CK.DB.HWorkspace.Page.Tests;
 
@@ -29,20 +30,20 @@ public class HWorkspacePageTests
             await workspacePagePackage.PlugWorkspacePageAsync( ctx, 1, parentWorkspace.WorkspaceId );
 
             var parentWebPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, parentWorkspace.WorkspaceId );
-            parentWebPage.Should().NotBeNull();
+            parentWebPage.ShouldNotBeNull();
 
             string workspaceName = GetNewGuid();
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, workspaceName, parentWorkspace.WorkspaceId );
             await workspacePagePackage.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
             var webPage = await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId );
-            webPage.Should().NotBeNull();
+            webPage.ShouldNotBeNull();
 
             string resPath = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<string>(
                 "select ResPath from CK.tResPath where ResId = @PageId;",
                 new { webPage!.PageId } );
 
-            resPath.Should().NotBeNull().And.Be( $"P/{parentWorkspaceName}/{workspaceName}" );
+            resPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}" );
         }
     }
 
@@ -70,7 +71,7 @@ public class HWorkspacePageTests
             await zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentWorkspace.WorkspaceId );
 
             (await webPageTable.GetWebPageByIdAsync( ctx, workspacePage!.PageId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{parentWorkspaceName}/{workspaceName}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}" );
 
             // Create new workspace and move
 
@@ -81,7 +82,7 @@ public class HWorkspacePageTests
             await zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, newParentWorkspace.WorkspaceId );
 
             (await webPageTable.GetWebPageByIdAsync( ctx, workspacePage.PageId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{newParentWorkspaceName}/{workspaceName}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{newParentWorkspaceName}/{workspaceName}" );
         }
     }
 
@@ -115,14 +116,14 @@ public class HWorkspacePageTests
             int childPage2Id = await webPageTable.CreateWebPageAsync( ctx, 1, child1PageId, childPage2Name, childPage1Name );
 
             (await webPageTable.GetWebPageByIdAsync( ctx, workspacePage.PageId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{parentWorkspaceName}/{workspaceName}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}" );
+
             (await webPageTable.GetWebPageByIdAsync( ctx, child1PageId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{parentWorkspaceName}/{workspaceName}/{childPage1Name}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}/{childPage1Name}" );
             (await webPageTable.GetWebPageByIdAsync( ctx, childPage2Id ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{parentWorkspaceName}/{workspaceName}/{childPage1Name}/{childPage2Name}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}/{childPage1Name}/{childPage2Name}" );
 
             // Create new workspace and move
-
             var newParentWorkspaceName = GetNewGuid( 20 );
             var newParentWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, newParentWorkspaceName );
             await workspacePagePackage.PlugWorkspacePageAsync( ctx, 1, newParentWorkspace.WorkspaceId );
@@ -130,11 +131,11 @@ public class HWorkspacePageTests
             await zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, newParentWorkspace.WorkspaceId );
 
             (await webPageTable.GetWebPageByIdAsync( ctx, workspacePage.PageId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{newParentWorkspaceName}/{workspaceName}" }, o => o.Including( i => i.ResPath ) );
+                      .ShouldNotBeNull().ResPath.ShouldBe( $"P/{newParentWorkspaceName}/{workspaceName}" );
             (await webPageTable.GetWebPageByIdAsync( ctx, child1PageId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{newParentWorkspaceName}/{workspaceName}/{childPage1Name}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{newParentWorkspaceName}/{workspaceName}/{childPage1Name}" );
             (await webPageTable.GetWebPageByIdAsync( ctx, childPage2Id ))
-                .Should().NotBeNull().And.BeEquivalentTo( new { ResPath = $"P/{newParentWorkspaceName}/{workspaceName}/{childPage1Name}/{childPage2Name}" }, o => o.Including( i => i.ResPath ) );
+                .ShouldNotBeNull().ResPath.ShouldBe( $"P/{newParentWorkspaceName}/{workspaceName}/{childPage1Name}/{childPage2Name}" );
         }
     }
 
@@ -158,14 +159,12 @@ public class HWorkspacePageTests
             int pageId = await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
             var webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
-            webPage.Should().NotBeNull();
-            webPage!.ResPath.Should().Be( $"P/{parentWorkspaceName}/{workspaceName}" );
+            webPage.ShouldNotBeNull().ResPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}" );
 
             await zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, 0 );
 
             webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
-            webPage.Should().NotBeNull();
-            webPage!.ResPath.Should().Be( $"P/{workspaceName}" );
+            webPage.ShouldNotBeNull().ResPath.ShouldBe( $"P/{workspaceName}" );
         }
     }
 
@@ -187,13 +186,13 @@ public class HWorkspacePageTests
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, workspaceName, parentWorkspace.WorkspaceId );
 
             (await workspaceTable.GetWebPageFromWorkspaceIdAsync( ctx, workspace.WorkspaceId ))
-                .Should().NotBeNull().And.BeEquivalentTo( new WorkspaceTableExtensions.WebPage { AclId = 0, PageId = 0 } );
+                .ShouldBeEquivalentTo( new WorkspaceTableExtensions.WebPage { AclId = 0, PageId = 0 } );
 
             int pageId = await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
             var webPage = await webPageTable.GetWebPageByIdAsync( ctx, pageId );
-            webPage.Should().NotBeNull();
-            webPage!.ResPath.Should().Be( $"P/{parentWorkspaceName}/{workspaceName}" );
+            webPage.ShouldNotBeNull();
+            webPage!.ResPath.ShouldBe( $"P/{parentWorkspaceName}/{workspaceName}" );
         }
     }
 
@@ -212,8 +211,8 @@ public class HWorkspacePageTests
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
             await workspacePageTable.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
-            await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentWorkspace.WorkspaceId ) )
-                           .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentWorkspace.WorkspaceId ) )
+                           .ShouldThrowAsync<Exception>();
         }
     }
 

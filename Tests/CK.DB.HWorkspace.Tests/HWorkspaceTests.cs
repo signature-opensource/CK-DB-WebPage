@@ -4,12 +4,13 @@ using CK.DB.HZone;
 using CK.SqlServer;
 using CK.Testing;
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 using static CK.Testing.MonitorTestHelper;
+using CK.Core;
 
 namespace CK.DB.HWorkspace.Tests;
 
@@ -29,7 +30,7 @@ public class HWorkspaceTests
 
             (await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
                 "select ParentZoneId from CK.vZone where ZoneId = @ChildWorkspaceId;",
-                new { ChildWorkspaceId = childWorkspace.WorkspaceId } )).Should().Be( parentWorkspace.WorkspaceId );
+                new { ChildWorkspaceId = childWorkspace.WorkspaceId } )).ShouldBe( parentWorkspace.WorkspaceId );
         }
     }
 
@@ -47,7 +48,7 @@ public class HWorkspaceTests
 
             (await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int?>(
                 "select WorkspaceId from CK.tWorkspace where WorkspaceId = @WorkspaceId;",
-                new { workspace.WorkspaceId } )).Should().BeNull();
+                new { workspace.WorkspaceId } )).ShouldBeNull();
         }
     }
 
@@ -62,8 +63,8 @@ public class HWorkspaceTests
             var parentWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, Guid.NewGuid().ToString() );
             await workspaceTable.CreateWorkspaceAsync( ctx, 1, Guid.NewGuid().ToString(), parentWorkspace.WorkspaceId );
 
-            await workspaceTable.Invoking( async table => await table.UnplugWorkspaceAsync( ctx, 1, parentWorkspace.WorkspaceId ) )
-                                .Should().ThrowAsync<Exception>();
+            await Util.Awaitable( () => workspaceTable.UnplugWorkspaceAsync( ctx, 1, parentWorkspace.WorkspaceId ) )
+                                .ShouldThrowAsync<Exception>();
         }
     }
 
@@ -77,8 +78,8 @@ public class HWorkspaceTests
         {
             var (owId, dwId, cId, userId) = await HiearchicalWorkspacesAsync( ctx, 127, 127, 80 /* SuperEditor */ );
 
-            await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
-                           .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => zoneTable.MoveZoneAsync( ctx, userId, cId, dwId ) )
+                           .ShouldThrowAsync<Exception>();
         }
     }
 
@@ -111,15 +112,15 @@ public class HWorkspaceTests
             int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( owId );
+            parentZoneId.ShouldBe( owId );
 
-            await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
-                           .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => zoneTable.MoveZoneAsync( ctx, userId, cId, dwId ) )
+                           .ShouldThrowAsync<Exception>();
 
             parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( owId );
+            parentZoneId.ShouldBe( owId );
         }
     }
 
@@ -136,14 +137,14 @@ public class HWorkspaceTests
             int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( owId );
+            parentZoneId.ShouldBe( owId );
 
             await zoneTable.MoveZoneAsync( ctx, userId, cId, dwId );
 
             parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( dwId );
+            parentZoneId.ShouldBe( dwId );
         }
     }
 
@@ -160,15 +161,15 @@ public class HWorkspaceTests
             int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( owId );
+            parentZoneId.ShouldBe( owId );
 
-            await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, cId, dwId ) )
-                           .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => zoneTable.MoveZoneAsync( ctx, userId, cId, dwId ) )
+                           .ShouldThrowAsync<Exception>();
 
             parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( owId );
+            parentZoneId.ShouldBe( owId );
         }
     }
 
@@ -185,14 +186,14 @@ public class HWorkspaceTests
             int parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( owId );
+            parentZoneId.ShouldBe( owId );
 
             await zoneTable.MoveZoneAsync( ctx, userId, cId, dwId );
 
             parentZoneId = await ctx.GetConnectionController( zoneTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId;",
                 new { WorkspaceId = cId } );
-            parentZoneId.Should().Be( dwId );
+            parentZoneId.ShouldBe( dwId );
         }
     }
 
@@ -212,18 +213,18 @@ public class HWorkspaceTests
                 @"select ZoneId from CK.vGroup where GroupId = @WorkspaceId;",
                 new { workspace.WorkspaceId } );
 
-            parentId.Should().Be( parentWorkspace.WorkspaceId );
+            parentId.ShouldBe( parentWorkspace.WorkspaceId );
 
             var parentZoneId = await zoneTable.CreateZoneAsync( ctx, 1 );
 
-            await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentZoneId ) )
-                           .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => zoneTable.MoveZoneAsync( ctx, 1, workspace.WorkspaceId, parentZoneId ) )
+                           .ShouldThrowAsync<Exception>();
 
             parentId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ZoneId from CK.vGroup where GroupId = @WorkspaceId;",
                 new { workspace.WorkspaceId } );
 
-            parentId.Should().Be( parentWorkspace.WorkspaceId );
+            parentId.ShouldBe( parentWorkspace.WorkspaceId );
         }
     }
 
@@ -280,13 +281,13 @@ public class HWorkspaceTests
             var parentWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, userId, GetNewGuid() );
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, userId, GetNewGuid(), parentWorkspace.WorkspaceId );
 
-            await zoneTable.Invoking( table => table.MoveZoneAsync( ctx, userId, workspace.WorkspaceId, 0 ) )
-                .Should().ThrowAsync<Exception>();
+            await Util.Invokable( () => zoneTable.MoveZoneAsync( ctx, userId, workspace.WorkspaceId, 0 ) )
+                .ShouldThrowAsync<Exception>();
 
             (await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
                 @"select ParentZoneId from CK.vZone where ZoneId = @WorkspaceId",
                 new { workspace.WorkspaceId } ))
-                .Should().Be( parentWorkspace.WorkspaceId );
+                .ShouldBe( parentWorkspace.WorkspaceId );
         }
     }
 
