@@ -18,7 +18,7 @@ public class WebPageTests
 {
     [TestCase( -3712 )]
     [TestCase( 0 )]
-    public async Task invaid_actor_cannot_create_page_Async( int actorId )
+    public async Task invalid_actor_cannot_create_page_Async( int actorId )
     {
         var services = SharedEngine.AutomaticServices;
         var webPageTable = services.GetRequiredService<WebPageTable>();
@@ -32,7 +32,7 @@ public class WebPageTests
 
     [TestCase( -3712 )]
     [TestCase( int.MaxValue )]
-    public async Task invaid_parent_page_throw_an_error_Async( int parentPageId )
+    public async Task invalid_parent_page_throw_an_error_Async( int parentPageId )
     {
         var services = SharedEngine.AutomaticServices;
         var webPageTable = services.GetRequiredService<WebPageTable>();

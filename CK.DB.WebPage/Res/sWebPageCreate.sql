@@ -6,6 +6,7 @@ create procedure CK.sWebPageCreate
     @PageName varchar(32),
     @PageTitle nvarchar(400),
     @AclId int = 0,
+    @ComponentTypeId int = 0,
     @PageId int output
 )
 as
@@ -55,7 +56,7 @@ begin
     exec CK.sResCreateWithResPath @PagePath, @PageId output;
     exec CK.sResStringSet @PageId, @PageTitle;
 
-    insert into CK.tWebPage ( PageId, AclId ) values( @PageId, @AclId );
+    insert into CK.tWebPage( PageId, AclId, ComponentTypeId ) values( @PageId, @AclId, @ComponentTypeId );
 	
 	--<PostCreate />	
 	
