@@ -9,7 +9,7 @@ namespace CK.DB.WebPage;
 [SqlObjectItem( "vWebPage" )]
 public abstract class WebPageTable : SqlTable
 {
-    void StObjConstruct( CK.DB.Res.ResPath.Package resPath, CK.DB.Acl.Package acl, CK.DB.Res.ResString.Package resString )
+    void StObjConstruct( WebPageComponentTypeTable typeTable, CK.DB.Res.ResPath.Package resPath, CK.DB.Acl.Package acl, CK.DB.Res.ResString.Package resString )
     {
     }
 
@@ -24,9 +24,10 @@ public abstract class WebPageTable : SqlTable
     /// <param name="parentPageId">The parent page identifier.</param>
     /// <param name="pageName">The name of the page.</param>
     /// <param name="aclId">The Acl of the page</param>
+    /// <param name="componentTypeId">The component's bound type.</param>
     /// <returns>The identifier of the page.</returns>
     [SqlProcedure( "sWebPageCreate" )]
-    public abstract Task<int> CreateWebPageAsync( ISqlCallContext ctx, int actorId, int parentPageId, string pageName, string pageTitle, int aclId = 0 );
+    public abstract Task<int> CreateWebPageAsync( ISqlCallContext ctx, int actorId, int parentPageId, string pageName, string pageTitle, int aclId = 0, int componentTypeId = 0 );
 
     /// <summary>
     /// Destroy the WebPage.

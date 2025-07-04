@@ -22,17 +22,18 @@ begin
     if @PageId = 0
     begin
         declare @WorkspaceName nvarchar(128);
-        declare @WorkspaceAlcId int;
+        declare @WorkspaceAclId int;
     
-        select @WorkspaceName = WorkspaceName, @WorkspaceAlcId = AclId
+        select @WorkspaceName = WorkspaceName, @WorkspaceAclId = AclId
             from CK.vWorkspace
             where WorkspaceId = @WorkspaceId;
     
         if (len(@WorkspaceName) > 32) throw 50000, 'WorkspaceNameIsTooLong', 1;
     
         --<PrePlug revert>
-    
-        exec CK.sWebPageCreate @ActorId, 0, @WorkspaceName, @WorkspaceName, @WorkspaceAlcId, @PageId output;
+
+        declare @ComponentTypeId int = 0;
+        exec CK.sWebPageCreate @ActorId, 0, @WorkspaceName, @WorkspaceName, @WorkspaceAclId, @ComponentTypeId, @PageId output;
     
         update CK.tWorkspace
             set PageId = @PageId
