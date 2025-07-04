@@ -11,10 +11,13 @@ public static class WebPageTableExtensions
         return await ctx.GetConnectionController( @this ).QuerySingleOrDefaultAsync<WebPage?>(
             @"select wp.PageId
                         ,wp.AclId
+                        ,ct.ComponentTypeId
+                        ,ComponentTypeName = ct.TypeName
                         ,rp.ResPath
                         ,rppp.ParentResId as ParentPageId
                         ,rs.[Value] as PageTitle
                       from CK.tWebPage wp
+                      inner join CK.tWebPageComponentType ct on wp.ComponentTypeId = ct.ComponentTypeId
                       inner join CK.tResPath rp
                           on wp.PageId = rp.ResId
                       inner join CK.tResString rs
@@ -29,6 +32,8 @@ public static class WebPageTableExtensions
     {
         public int PageId { get; set; }
         public int AclId { get; set; }
+        public int ComponentTypeId { get; set; }
+        public string ComponentTypeName { get; set; } = string.Empty;
         public string ResPath { get; set; } = string.Empty;
         public string PageTitle { get; set; } = string.Empty;
         public int ParentPageId { get; set; }
