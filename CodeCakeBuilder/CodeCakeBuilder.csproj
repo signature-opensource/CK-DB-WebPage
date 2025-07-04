@@ -9,7 +9,7 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.Core" Version="22.1.1--0000-develop" />
+    <PackageReference Include="CK.Core" Version="21.1.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NuGet.Credentials" Version="6.13.1" />
@@ -18,7 +18,7 @@
     <None Remove="TestResult.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SimpleGitVersion.Cake" Version="11.1.2--0000-develop" />
+    <PackageReference Include="SimpleGitVersion.Cake" Version="11.1.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Releases\" />
