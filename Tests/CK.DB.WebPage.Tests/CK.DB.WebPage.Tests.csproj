@@ -5,10 +5,10 @@
     <IsPackable>True</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.Acl.Tests" Version="26.0.1" />
-    <PackageReference Include="CK.DB.Res.ResPath.Tests" Version="9.0.1" />
-    <PackageReference Include="CK.DB.Res.ResString.Tests" Version="26.0.1" />
-    <PackageReference Include="CK.SqlServer.Dapper" Version="13.0.0" />
+    <PackageReference Include="CK.DB.Acl.Tests" Version="26.0.2--0001-develop" />
+    <PackageReference Include="CK.DB.Res.ResPath.Tests" Version="9.0.2--0001-develop" />
+    <PackageReference Include="CK.DB.Res.ResString.Tests" Version="26.0.2--0001-develop" />
+    <PackageReference Include="CK.SqlServer.Dapper" Version="13.0.1--0003-develop" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
   </ItemGroup>
