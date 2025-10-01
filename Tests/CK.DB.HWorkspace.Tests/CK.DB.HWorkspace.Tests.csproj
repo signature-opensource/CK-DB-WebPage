@@ -4,9 +4,9 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.HZone.Tests" Version="26.0.3--0001-develop" />
-    <PackageReference Include="CK.DB.Workspace.Tests" Version="13.0.3--0001-develop" />
-    <PackageReference Include="CK.SqlServer.Dapper" Version="13.0.2--0001-develop" />
+    <PackageReference Include="CK.DB.HZone.Tests" Version="26.0.3--0002-develop" />
+    <PackageReference Include="CK.DB.Workspace.Tests" Version="13.0.3--0002-develop" />
+    <PackageReference Include="CK.SqlServer.Dapper" Version="13.0.2--0002-develop" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
   </ItemGroup>
