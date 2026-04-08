@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".gitignore" />
+    <File Path="appveyor.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <File Path="Tests/TestHelper.config" />
+    <Project Path="Tests/CK.DB.HWorkspace.Page.Tests/CK.DB.HWorkspace.Page.Tests.csproj" />
+    <Project Path="Tests/CK.DB.HWorkspace.Tests/CK.DB.HWorkspace.Tests.csproj" />
+    <Project Path="Tests/CK.DB.WebPage.Tests/CK.DB.WebPage.Tests.csproj" />
+    <Project Path="Tests/CK.DB.Workspace.Page.Tests/CK.DB.Workspace.Page.Tests.csproj" />
+  </Folder>
+  <Project Path="CK.DB.HWorkspace.Page/CK.DB.HWorkspace.Page.csproj" />
+  <Project Path="CK.DB.HWorkspace/CK.DB.HWorkspace.csproj" />
+  <Project Path="CK.DB.WebPage/CK.DB.WebPage.csproj" />
+  <Project Path="CK.DB.Workspace.Page/CK.DB.Workspace.Page.csproj" />
+</Solution>
