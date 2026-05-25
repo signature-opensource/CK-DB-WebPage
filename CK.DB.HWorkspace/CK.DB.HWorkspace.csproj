@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CK.DB.HZone" Version="28.0.1--ci.1" />
+    <PackageReference Include="CK.DB.HZone" Version="28.0.1--ci.4" />
     <PackageReference Include="CK.DB.Workspace" Version="15.1.0--ci.8" />
   </ItemGroup>
   <ItemGroup>
