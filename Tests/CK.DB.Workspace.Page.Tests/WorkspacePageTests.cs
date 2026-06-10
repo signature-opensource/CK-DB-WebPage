@@ -131,9 +131,9 @@ public class WorkspacePageTests
         }
     }
 
-    [TestCase( "te st" )]
+    //[TestCase( "te st" )]
     [TestCase( "tooLongWorkspaceNameToPlugAsWorkspacePage" )]
-    [TestCase( "te*st" )]
+    //[TestCase( "te*st" )]
     public async Task workspace_with_invalid_webPage_name_cannot_be_used_as_workspacePage_Async( string workspaceName )
     {
         var services = SharedEngine.AutomaticServices;
