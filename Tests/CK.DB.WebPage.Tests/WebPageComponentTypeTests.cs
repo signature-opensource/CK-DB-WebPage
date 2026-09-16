@@ -1,4 +1,3 @@
-using Azure;
 using CK.Core;
 using CK.SqlServer;
 using CK.Testing;
