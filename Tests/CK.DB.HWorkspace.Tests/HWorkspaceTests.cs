@@ -242,21 +242,21 @@ public class HWorkspaceTests
         int userId = await userTable.CreateUserAsync( ctx, 1, Guid.NewGuid().ToString() );
 
         var origineWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, Guid.NewGuid().ToString() );
-        await zoneTable.AddUserAsync( ctx, 1, origineWorkspace.WorkspaceId, userId );
+        await zoneTable.AddMemberAsync( ctx, 1, origineWorkspace.WorkspaceId, userId );
         int aclId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
             "select AclId from CK.tWorkspace where WorkspaceId = @WorkspaceId;",
             new { origineWorkspace.WorkspaceId } );
         await aclTable.AclGrantSetAsync( ctx, 1, aclId, userId, "Grant user to workspace", userOrigineParentGrantLevel );
 
         var destinationWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, Guid.NewGuid().ToString() );
-        await zoneTable.AddUserAsync( ctx, 1, destinationWorkspace.WorkspaceId, userId );
+        await zoneTable.AddMemberAsync( ctx, 1, destinationWorkspace.WorkspaceId, userId );
         aclId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
             "select AclId from CK.tWorkspace where WorkspaceId = @WorkspaceId;",
             new { destinationWorkspace.WorkspaceId } );
         await aclTable.AclGrantSetAsync( ctx, 1, aclId, userId, "Grant user to workspace", userDestinationParentGrantLevel );
 
         var childWorkspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, Guid.NewGuid().ToString(), origineWorkspace.WorkspaceId );
-        await zoneTable.AddUserAsync( ctx, 1, childWorkspace.WorkspaceId, userId );
+        await zoneTable.AddMemberAsync( ctx, 1, childWorkspace.WorkspaceId, userId );
         aclId = await ctx.GetConnectionController( workspaceTable ).QuerySingleOrDefaultAsync<int>(
             "select AclId from CK.tWorkspace where WorkspaceId = @WorkspaceId;",
             new { childWorkspace.WorkspaceId } );

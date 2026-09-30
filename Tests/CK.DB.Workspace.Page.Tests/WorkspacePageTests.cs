@@ -272,24 +272,24 @@ public class WorkspacePageTests
 
         using( SqlStandardCallContext ctx = new() )
         {
-            async Task<string> GetWebPageResPathAsync( int workspaceId )
+            async Task<string?> GetWebPageResPathAsync( SqlStandardCallContext ctx, int workspaceId )
             {
                 return await ctx.GetConnectionController( workspacePagePkg ).QuerySingleOrDefaultAsync<string>(
-                @"select rp.ResPath
-                          from CK.tResPath rp
-                          inner join CK.tWorkspace w on rp.ResId = w.PageId
-                          where w.WorkspaceId = @WorkspaceId;",
-                    new { WorkspaceId = workspaceId } );
+                                    @"select rp.ResPath
+                                              from CK.tResPath rp
+                                              inner join CK.tWorkspace w on rp.ResId = w.PageId
+                                              where w.WorkspaceId = @WorkspaceId;",
+                                        new { WorkspaceId = workspaceId } );
             };
 
             var workspace = await workspaceTable.CreateWorkspaceAsync( ctx, 1, GetNewGuid() );
             await workspacePagePkg.PlugWorkspacePageAsync( ctx, 1, workspace.WorkspaceId );
 
-            (await GetWebPageResPathAsync( workspace.WorkspaceId )).ShouldEndWith( '/' + workspace.Name );
+            (await GetWebPageResPathAsync( ctx, workspace.WorkspaceId )).ShouldEndWith( '/' + workspace.Name );
 
             string workspaceName = await groupNamePkg.GroupRenameAsync( ctx, 1, workspace.WorkspaceId, GetNewGuid() );
 
-            (await GetWebPageResPathAsync( workspace.WorkspaceId )).ShouldEndWith( '/' + workspaceName );
+            (await GetWebPageResPathAsync( ctx, workspace.WorkspaceId )).ShouldEndWith( '/' + workspaceName );
         }
     }
 
