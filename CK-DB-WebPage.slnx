@@ -2,7 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".config/dotnet-tools.json" />
     <File Path=".gitignore" />
-    <File Path="appveyor.yml" />
     <File Path="Directory.Build.props" />
     <File Path="NuGet.config" />
     <File Path="README.md" />
